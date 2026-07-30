@@ -1,0 +1,358 @@
+@extends('layouts.admin')
+
+@section('title', 'Reports & Analytics')
+
+@section('page-title', 'Reports & Analytics')
+
+@section('content')
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h3 class="fw-bold mb-1">
+
+            Reports & Analytics
+
+        </h3>
+
+        <p class="text-muted mb-0">
+
+            Generate and export platform reports.
+
+        </p>
+
+    </div>
+
+    <div>
+
+        <button class="btn btn-danger me-2">
+
+            <a href="{{ route('admin.reports.export',['revenue','pdf']) }}"
+            class="btn btn-danger">
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+
+                Export PDF
+            </a>    
+
+        </button>
+
+        <button class="btn btn-success me-2">
+
+            <a href="{{ route('admin.reports.export',['revenue','excel']) }}"
+            class="btn btn-success">
+                <i class="bi bi-file-earmark-excel me-2"></i>
+
+                Export Excel
+            </a>    
+
+        </button>
+
+        <button class="btn btn-primary">
+
+            <a href="{{ route('admin.reports.export',['revenue','csv']) }}"
+            class="btn btn-primary">
+                <i class="bi bi-filetype-csv me-2"></i>
+
+                Export CSV
+            </a>
+        </button>
+
+    </div>
+
+</div>
+
+<!-- Reports -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-cash-coin fs-1 text-success"></i>
+
+                <h5 class="mt-3">
+
+                    Revenue
+
+                </h5>
+                <a href="{{ route('admin.reports.generate','revenue') }}"
+                class="btn btn-outline-success btn-sm mt-2">
+
+                    Generate Report
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-arrow-left-right fs-1 text-primary"></i>
+
+                <h5 class="mt-3">
+
+                    Transactions
+
+                </h5>
+
+                <a href="{{ route('admin.reports.generate','transactions') }}"
+                class="btn btn-outline-primary btn-sm mt-2">
+
+                    Generate Report
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-people-fill fs-1 text-info"></i>
+
+                <h5 class="mt-3">
+
+                    Users
+
+                </h5>
+
+                <a href="{{ route('admin.reports.generate','users') }}"
+                class="btn btn-outline-info btn-sm mt-2">
+
+                Generate Report
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-wallet2 fs-1 text-warning"></i>
+
+                <h5 class="mt-3">
+
+                    Deposits
+
+                </h5>
+
+                <a href="{{ route('admin.reports.generate','deposits') }}"
+                class="btn btn-outline-warning btn-sm mt-2">
+
+                    Generate Report
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-person-plus-fill fs-1 text-secondary"></i>
+
+                <h5 class="mt-3">
+
+                    Referrals
+
+                </h5>
+
+                <a href="{{ route('admin.reports.generate','referrals') }}"
+                class="btn btn-outline-secondary btn-sm mt-2">
+
+                    Generate Report
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-shield-check fs-1 text-success"></i>
+
+                <h5 class="mt-3">
+
+                    KYC
+
+                </h5>
+
+                <a href="{{ route('admin.reports.generate','kyc') }}"
+                class="btn btn-outline-success btn-sm mt-2">
+
+                    Generate Report
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center">
+
+                <i class="bi bi-grid-fill fs-1 text-primary"></i>
+
+                <h5 class="mt-3">
+
+                    Services
+
+                </h5>
+
+                <a href="{{ route('admin.reports.generate','services') }}"
+                class="btn btn-outline-primary btn-sm mt-2">
+
+                    Generate Report
+
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Report History -->
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+
+        <h5 class="mb-0">
+
+            Generated Reports
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>Report</th>
+
+                        <th>Generated By</th>
+
+                        <th>Export Type</th>
+
+                        <th>Date</th>
+
+                        <th class="text-center">
+
+                            Action
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach($histories as $history)
+
+                        <tr>
+
+                            <td>{{ ucfirst($history->report) }}</td>
+
+                            <td>{{ $history->admin->name }}</td>
+
+                            <td>
+
+                                <span class="badge bg-primary">
+
+                                    {{ strtoupper($history->export_type) }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {{ $history->created_at->format('d M Y') }}
+
+                            </td>
+
+                            <td>
+
+                                <a href="{{ asset('storage/'.$history->file) }}"
+                                class="btn btn-primary btn-sm">
+
+                                    <i class="bi bi-download"></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- Pagination -->
+
+        <div class="mt-3">
+
+            {{ $histories->links() }}
+
+        </div>
+
+
+    </div>
+
+</div>
+
+@endsection
