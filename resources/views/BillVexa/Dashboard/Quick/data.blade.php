@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1.0">
 
     <title>
-        BillVexa Data Bundle Dashboard
+        {{ $setting->site_name ?? 'BillVexa' }} Data Bundle Dashboard
     </title>
 
     <!-- icon image -->
@@ -334,7 +334,7 @@
     <div class="sidebar d-none d-lg-flex flex-column">
 
         <div class="logo mb-5 text-white fs-2 fw-bold">
-            BillVexa
+            {{ $setting->site_name ?? 'BillVexa' }}
         </div>
 
         <a href={{ route('dashboard') }}>

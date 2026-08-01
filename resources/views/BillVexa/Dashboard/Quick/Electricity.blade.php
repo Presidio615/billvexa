@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1.0">
 
     <title>
-        BillVexa Electricity Dashboard
+        {{ $setting->site_name ?? 'BillVexa' }} Electricity Dashboard
     </title>
 
     <!-- icon image -->
@@ -302,7 +302,7 @@
     <div class="sidebar d-none d-lg-flex flex-column">
 
         <div class="logo mb-5 text-white fs-2 fw-bold">
-            BillVexa
+            {{ $setting->site_name ?? 'BillVexa' }}
         </div>
 
         <a href={{ route('dashboard') }}>

@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1.0">
 
     <title>
-        BillVexa Airtime Dashboard
+        {{ $setting->site_name ?? 'BillVexa' }} Airtime Dashboard
     </title>
     <!-- icon image -->
     <link rel="shortcut icon" href="../../../Assets/Image/icon.png" type="image/x-icon">
@@ -303,7 +303,7 @@
     <div class="sidebar d-none d-lg-flex flex-column">
 
         <div class="logo mb-5 text-white fs-2 fw-bold">
-            BillVexa
+            {{ $setting->site_name ?? 'BillVexa' }}
         </div>
 
         <a href={{ route('dashboard') }}>

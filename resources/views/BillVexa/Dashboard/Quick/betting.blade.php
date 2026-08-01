@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BillVexa Betting Dashboard</title>
+<title>{{ $setting->site_name ?? 'BillVexa' }} Betting Dashboard</title>
 
 <!-- icon image -->
 <link rel="shortcut icon" 
@@ -186,7 +186,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.c
     <div class="sidebar d-none d-lg-flex flex-column">
 
         <div class="logo mb-5 text-white fs-2 fw-bold">
-            BillVexa
+            {{ $setting->site_name ?? 'BillVexa' }}
         </div>
 
         <a href={{ route('dashboard') }}>
