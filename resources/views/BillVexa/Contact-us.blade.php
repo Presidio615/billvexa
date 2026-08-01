@@ -166,7 +166,7 @@
             <div class="container">
 
                 <a href="" class="navbar-brand p-2 fw-bolder fst-italic" style="color: blueviolet; font-size: 1.5rem;">
-                BillVexa
+                    {{ $setting->site_name ?? 'BillVexa' }}
                 </a>
 
                 <button class="navbar-toggler shadow-none border-0 me-2" data-bs-toggle="collapse" data-bs-target="#menu">
@@ -197,12 +197,12 @@
                     </h1>
 
                     <p class="lead">
-                        For any inquiries, support, or feedback, please feel free to reach out to us. We are here to assist you and ensure you have the best experience with BillVexa. You can contact us through the following channels:
+                        For any inquiries, support, or feedback, please feel free to reach out to us. We are here to assist you and ensure you have the best experience with {{ $setting->site_name ?? 'BillVexa' }}. You can contact us through the following channels:
                     </p>
                     <ul class="list-unstyled contact-list">
                         <li><i class="bi bi-envelope-fill"></i> Email: nd09079927615@gmail.com</li>
                         <li><i class="bi bi-telephone-fill"></i> Phone: +234 901 197 3177</li>
-                        <li><i class="bi bi-geo-alt-fill"></i> Address:  Awka, Nigeria</li>
+                        <li><i class="bi bi-geo-alt-fill"></i> Address:  Anambra, Nigeria</li>
                     </ul>
                 </div>
             </div>
@@ -236,11 +236,11 @@
                 <div class="text-dark text-center ">
 
                     <h1 class="display-4 fw-bolder" style="font-family: 'Playfair Display', serif;">
-                      Thank You for Choosing BillVexa!
+                      Thank You for Choosing {{ $setting->site_name ?? 'BillVexa' }}!
                     </h1>
 
                     <p class="lead">
-                        We appreciate your interest in BillVexa and look forward to assisting you with all your bill management needs. Our team is dedicated to providing you with the best service possible, and we are excited to have you as part of our community. Thank you for choosing BillVexa, and we can't wait to hear from you!
+                        We appreciate your interest in {{ $setting->site_name ?? 'BillVexa' }} and look forward to assisting you with all your bill management needs. Our team is dedicated to providing you with the best service possible, and we are excited to have you as part of our community. Thank you for choosing {{ $setting->site_name ?? 'BillVexa' }}, and we can't wait to hear from you!
                     </p>
                 </div>
             </div>
@@ -252,9 +252,9 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 pt-4">
-                        <h4>BillVexa </h4>
+                        <h4>{{ $setting->site_name ?? 'BillVexa' }} </h4>
                         <p class="lead" style="font-size: medium;">
-                                BillVexa is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
+                            {{ $setting->site_name ?? 'BillVexa' }} is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
                             </p>
                         </div>
 
@@ -300,7 +300,7 @@
                 <script>
                     document.write( new Date().getFullYear() )
                 </script>
-            </span> BillVexa.
+            </span> {{ $setting->site_name ?? 'BillVexa' }}.
             All rights reserved.
         </div>
     </footer>   

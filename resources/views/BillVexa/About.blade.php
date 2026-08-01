@@ -156,7 +156,7 @@
             <div class="container">
 
                 <a href="" class="navbar-brand p-2 fw-bolder fst-italic" style="color: blueviolet; font-size: 1.5rem;">
-                BillVexa
+                    {{ $setting->site_name ?? 'BillVexa' }}
                 </a>
 
                 <button class="navbar-toggler shadow-none border-0 me-2" data-bs-toggle="collapse" data-bs-target="#menu">
@@ -184,11 +184,11 @@
                 <div class="text-white text-center hero-content">
                     <h1 class="display-4 fw-bolder"
                     style="font-family: 'Playfair Display', serif;">
-                    About BillVexa
+                        About {{ $setting->site_name ?? 'BillVexa' }}
                     </h1>
 
                     <p class="lead">
-                        BillVexa is a web application that allows users to manage their bills and payments in one place. It provides a simple and intuitive interface for users to track their expenses, set reminders for upcoming bills, and make payments securely.
+                        {{ $setting->site_name ?? 'BillVexa' }} is a web application that allows users to manage their bills and payments in one place. It provides a simple and intuitive interface for users to track their expenses, set reminders for upcoming bills, and make payments securely.
                     </p>
                 </div>
             </div>
@@ -223,7 +223,7 @@
                     text-center ">
     
                         <h1 class="display-4 fw-bolder" style="font-family: 'Playfair Display', serif;">
-                        Our Vision
+                            Our Vision
                         </h1>
     
                         <p class="lead">
@@ -263,9 +263,9 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 pt-4">
-                        <h4>BillVexa </h4>
+                        <h4>{{ $setting->site_name ?? 'BillVexa' }} </h4>
                         <p class="lead" style="font-size: medium;">
-                                BillVexa is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
+                            {{ $setting->site_name ?? 'BillVexa' }} is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
                             </p>
                         </div>
 
@@ -315,7 +315,7 @@
                 <script>
                     document.write( new Date().getFullYear() )
                 </script>
-            </span> BillVexa.
+            </span> {{ $setting->site_name ?? 'BillVexa' }}.
             All rights reserved.
         </div>
     </footer>   

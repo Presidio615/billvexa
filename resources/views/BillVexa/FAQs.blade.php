@@ -172,7 +172,7 @@
             <div class="container">
 
                 <a href="" class="navbar-brand p-2 fw-bolder fst-italic" style="color: blueviolet; font-size: 1.5rem;">
-                BillVexa
+                    {{ $setting->site_name ?? 'BillVexa' }}
                 </a>
 
                 <button class="navbar-toggler shadow-none border-0 me-2" data-bs-toggle="collapse"      data-bs-target="#menu">
@@ -225,7 +225,7 @@
                 </h1>
 
                 <p class="text-muted">
-                    Find answers to common questions about BillVexa services.
+                    Find answers to common questions about {{ $setting->site_name ?? 'BillVexa' }} services.
                 </p>
             </div>
 
@@ -247,7 +247,7 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#accd">
 
-                                    Why should I use BillVexa to pay my bills?
+                                    Why should I use {{ $setting->site_name ?? 'BillVexa' }} to pay my bills?
 
                                 </button>
 
@@ -260,7 +260,7 @@
 
                                 <div class="accordion-body text-secondary">
 
-                                    Using BillVexa to pay your bills offers several advantages. It provides a convenient and secure way to manage your bills and stay organized.
+                                    Using {{ $setting->site_name ?? 'BillVexa' }} to pay your bills offers several advantages. It provides a convenient and secure way to manage your bills and stay organized.
 
                                 </div>
 
@@ -279,7 +279,7 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#accd1">
 
-                                    Is BillVexa free to use?
+                                    Is {{ $setting->site_name ?? 'BillVexa' }} free to use?
 
                                 </button>
 
@@ -292,7 +292,7 @@
 
                                 <div class="accordion-body text-secondary">
 
-                                    Yes, BillVexa is free to use for managing your bills and staying organized.
+                                    Yes, {{ $setting->site_name ?? 'BillVexa' }} is free to use for managing your bills and staying organized.
 
                                 </div>
 
@@ -311,7 +311,7 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#accd2">
 
-                                    Can I use BillVexa for multiple accounts?
+                                    Can I use {{ $setting->site_name ?? 'BillVexa' }} for multiple accounts?
 
                                 </button>
 
@@ -324,7 +324,7 @@
 
                                 <div class="accordion-body text-secondary">
 
-                                    Yes, BillVexa allows you to manage and pay bills for multiple accounts easily.
+                                    Yes, {{ $setting->site_name ?? 'BillVexa' }} allows you to manage and pay bills for multiple accounts easily.
 
                                 </div>
 
@@ -356,7 +356,7 @@
 
                                 <div class="accordion-body text-secondary">
 
-                                    Yes, BillVexa supports international bill payments with various payment methods.
+                                    Yes, {{ $setting->site_name ?? 'BillVexa' }} supports international bill payments with various payment methods.
 
                                 </div>
 
@@ -388,7 +388,7 @@
 
                                 <div class="accordion-body text-secondary">
 
-                                    Yes, you can schedule recurring bill payments directly on BillVexa.
+                                    Yes, you can schedule recurring bill payments directly on {{ $setting->site_name ?? 'BillVexa' }}.
 
                                 </div>
 
@@ -443,9 +443,9 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 pt-4">
-                        <h4>BillVexa </h4>
+                        <h4>{{ $setting->site_name ?? 'BillVexa' }} </h4>
                         <p class="lead" style="font-size: medium;">
-                                BillVexa is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
+                            {{ $setting->site_name ?? 'BillVexa' }} is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
                             </p>
                         </div>
 
@@ -491,7 +491,7 @@
                 <script>
                     document.write( new Date().getFullYear() )
                 </script>
-            </span> BillVexa.
+            </span> {{ $setting->site_name ?? 'BillVexa' }}.
             All right reserved.
         </div>
     </footer>   

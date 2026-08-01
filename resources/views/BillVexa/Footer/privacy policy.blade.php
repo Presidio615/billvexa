@@ -87,7 +87,7 @@
         <div class="container">
 
             <a href="{{ route('billvexa') }}" class="navbar-brand p-2 fw-bolder fst-italic" style="color: blueviolet; font-size: 1.5rem;">
-                BillVexa
+                {{ $setting->site_name ?? 'BillVexa' }}
             </a>
 
             <button class="navbar-toggler shadow-none border-0 me-2" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu"
@@ -129,9 +129,9 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 pt-4">
-                        <h4>BillVexa </h4>
+                        <h4>{{ $setting->site_name ?? 'BillVexa' }} </h4>
                         <p class="lead" style="font-size: medium;">
-                                BillVexa is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
+                            {{ $setting->site_name ?? 'BillVexa' }} is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
                             </p>
                         </div>
 
@@ -181,7 +181,7 @@
                 <script>
                     document.write( new Date().getFullYear() )
                 </script>
-            </span> BillVexa.
+            </span> {{ $setting->site_name ?? 'BillVexa' }}.
             All rights reserved.
         </div>
     </footer>   

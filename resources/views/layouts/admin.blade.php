@@ -353,80 +353,80 @@
 
                 <div class="dropdown me-2">
 
-<button class="btn btn-light rounded-circle position-relative"
-        data-bs-toggle="dropdown">
+                    <button class="btn btn-light rounded-circle position-relative"
+                            data-bs-toggle="dropdown">
 
-    <i class="bi bi-bell fs-5"></i>
+                        <i class="bi bi-bell fs-5"></i>
 
-    @if($notificationCount > 0)
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ $notificationCount }}
-        </span>
-    @endif
+                        @if($notificationCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ $notificationCount }}
+                            </span>
+                        @endif
 
-</button>
+                    </button>
 
-<ul class="dropdown-menu dropdown-menu-end shadow p-0" style="width:380px; max-height:450px; overflow-y:auto;">
+                    <ul class="dropdown-menu dropdown-menu-end shadow p-0" style="width:380px; max-height:450px; overflow-y:auto;">
 
-    <li class="dropdown-header fw-bold border-bottom py-3">
-        Transaction Notifications
-    </li>
+                        <li class="dropdown-header fw-bold border-bottom py-3">
+                            Transaction Notifications
+                        </li>
 
-    @forelse($notifications as $notification)
+                        @forelse($notifications as $notification)
 
-        <li>
-        {{ $notification->link }}
+                            <li>
+                            {{ $notification->link }}
 
-            <a href="{{ $notification->link ?? '#' }}"
-               class="dropdown-item py-3">
+                                <a href="{{ $notification->link ?? '#' }}"
+                                class="dropdown-item py-3">
 
-                <div class="d-flex justify-content-between">
+                                    <div class="d-flex justify-content-between">
 
-                    <strong>{{ $notification->title }}</strong>
+                                        <strong>{{ $notification->title }}</strong>
 
-                    @if(!$notification->is_read)
-                        <span class="badge bg-danger">New</span>
-                    @endif
+                                        @if(!$notification->is_read)
+                                            <span class="badge bg-danger">New</span>
+                                        @endif
+
+                                    </div>
+
+                                    <small class="text-muted d-block mt-1">
+                                        {{ \Illuminate\Support\Str::limit($notification->message,80) }}
+                                    </small>
+
+                                    <small class="text-secondary">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </small>
+
+                                </a>
+
+                            </li>
+
+                            @if(!$loop->last)
+                                <li><hr class="dropdown-divider m-0"></li>
+                            @endif
+
+                        @empty
+
+                            <li class="text-center py-4 text-muted">
+                                <i class="bi bi-bell-slash fs-2"></i><br>
+                                No transaction notifications
+                            </li>
+
+                        @endforelse
+
+                        <li><hr class="dropdown-divider m-0"></li>
+
+                        <li>
+                            <a href="{{ route('admin.transaction') }}"
+                            class="dropdown-item text-center fw-semibold py-2">
+                                View All Notifications
+                            </a>
+                        </li>
+
+                    </ul>
 
                 </div>
-
-                <small class="text-muted d-block mt-1">
-                    {{ \Illuminate\Support\Str::limit($notification->message,80) }}
-                </small>
-
-                <small class="text-secondary">
-                    {{ $notification->created_at->diffForHumans() }}
-                </small>
-
-            </a>
-
-        </li>
-
-        @if(!$loop->last)
-            <li><hr class="dropdown-divider m-0"></li>
-        @endif
-
-    @empty
-
-        <li class="text-center py-4 text-muted">
-            <i class="bi bi-bell-slash fs-2"></i><br>
-            No transaction notifications
-        </li>
-
-    @endforelse
-
-    <li><hr class="dropdown-divider m-0"></li>
-
-    <li>
-        <a href="{{ route('admin.transaction') }}"
-           class="dropdown-item text-center fw-semibold py-2">
-            View All Notifications
-        </a>
-    </li>
-
-</ul>
-
-</div>
                 <!-- Settings -->
 
                 <a href="{{ route('admin.setting') }}"

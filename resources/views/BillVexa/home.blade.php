@@ -138,9 +138,9 @@
 
 
     /* HERO IMAGE */
-    .image{
+    /* .image{
         animation: floatImage 4s ease-in-out infinite;
-    }
+    } */
 
     @keyframes floatImage{
         0%{
@@ -245,7 +245,7 @@
             <div class="container">
 
                 <a href="{{ route('billvexa') }}" class="navbar-brand p-2 fw-bolder fst-italic" style="color: blueviolet; font-size: 1.5rem;">
-                BillVexa
+                    {{ $setting->site_name ?? 'BillVexa' }}
                 </a>
                 
 
@@ -288,7 +288,7 @@
 
                     <h1 class="display-4 fw-bolder"
                        style="font-family: 'Playfair Display', serif;">
-                       BillVexa – The Ultimate Billing Solution
+                       {{ $setting->site_name ?? 'BillVexa' }} – The Ultimate Billing Solution
                     </h1>
 
                     <p class="lead">
@@ -300,9 +300,9 @@
 
                 <!-- Image -->
                 <div class="col-lg-6 order-1 order-lg-2 text-center">
-                    <img src="{{ asset('asset/Image/payment-1-removebg-preview.png') }}"
+                    <img src="{{ asset('asset/Image/iPhone-13-PRO-localhost.png') }}"
                         alt="BillVexa"
-                        class="img-fluid my-3 image">
+                        class="img-fluid mb-5 mt-auto image" width="200" height="250">
                 </div>
 
             </div>
@@ -318,7 +318,7 @@
         <div>
             <div class="text-center pb-4">
                 <h2 class="pt-5 fw-bold display-4">Our Features</h2>
-                <p class="lead">Discover the powerful features that make BillVexa the perfect solution for your billing needs.</p>
+                <p class="lead">Discover the powerful features that make {{ $setting->site_name ?? 'BillVexa' }} the perfect solution for your billing needs.</p>
             </div>
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
@@ -536,8 +536,8 @@
     <section style="background:paleturquoise;" class="reveal">
         <div class="container py-5">
             <div class="text-center pt-5">
-                <h2 class="fw-bold display-4">Why Choose <span style="color: blue;">BillVexa?</span></h2>
-                <p>BillVexa offers a convenient and secure way to manage your bills and stay organized. With our user-friendly platform, you can easily track your expenses, set reminders for due dates, and make payments online. Our services are designed to save you time and help you stay on top of your finances.</p>
+                <h2 class="fw-bold display-4">Why Choose <span style="color: blue;">{{ $setting->site_name ?? 'BillVexa' }}?</span></h2>
+                <p>{{ $setting->site_name ?? 'BillVexa' }} offers a convenient and secure way to manage your bills and stay organized. With our user-friendly platform, you can easily track your expenses, set reminders for due dates, and make payments online. Our services are designed to save you time and help you stay on top of your finances.</p>
             </div>
                 <div class="row g-4 mt-4">
                     <div class="col-lg-4 col-md-6">
@@ -616,42 +616,42 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 pt-4">
-                        <h4>BillVexa </h4>
+                        <h4>{{ $setting->site_name ?? 'BillVexa' }} </h4>
                         <p class="lead" style="font-size: medium;">
-                                BillVexa is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
-                            </p>
-                        </div>
+                            {{ $setting->site_name ?? 'BillVexa' }} is a leading online platform that provides convenient and secure solutions for managing your bills and staying organized. With our user-friendly interface and powerful features, we help you track your expenses, set reminders for due dates, and make payments online with ease. Our mission is to simplify your billing experience and help you stay on top of your finances.
+                        </p>
+                    </div>
 
-                        <div class="col-lg-3 pt-4" style="font-size: medium;">
-                            <h4>Page</h4>
-                            <ul class="navbar-nav lead">
-                                <li class="nav-item"><a href={{ route('billvexa') }} class="nav-link">Home</a></li>
-                                <li class="nav-item"><a href={{ route('billvexa.about') }}  class="nav-link">About</a></li>
-                                <li class="nav-item"><a href={{ route('billvexa.faqs') }}  class="nav-link">FAQs</a></li>
-                                <li class="nav-item"><a href={{ route('billvexa.contact') }} class="nav-link">Contact Us</a></li> 
-                            </ul>
-                        </div>
+                    <div class="col-lg-3 pt-4" style="font-size: medium;">
+                        <h4>Page</h4>
+                        <ul class="navbar-nav lead">
+                            <li class="nav-item"><a href={{ route('billvexa') }} class="nav-link">Home</a></li>
+                            <li class="nav-item"><a href={{ route('billvexa.about') }}  class="nav-link">About</a></li>
+                            <li class="nav-item"><a href={{ route('billvexa.faqs') }}  class="nav-link">FAQs</a></li>
+                            <li class="nav-item"><a href={{ route('billvexa.contact') }} class="nav-link">Contact Us</a></li> 
+                        </ul>
+                    </div>
 
-                        <div class="col-lg-3 pt-4" style="font-size: medium;">
-                            <h4>important links</h4>
-                            <ul class="navbar-nav lead">
-                                <li class="nav-item"><a href="{{ route('policy') }}"class="nav-link p-1">Privacy Policy</a>
-                                </li>
-                                <li class="nav-item"><a href="{{ route('terms') }}" class="nav-link p-1">Terms & Conditions</a>
-                                </li>
-                                <li class="nav-item"><a href="{{ route('refund') }}" class="nav-link p-1">Refund Policy</a>
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="col-lg-3 pt-4" style="font-size: medium;">
+                        <h4>important links</h4>
+                        <ul class="navbar-nav lead">
+                            <li class="nav-item"><a href="{{ route('policy') }}"class="nav-link p-1">Privacy Policy</a>
+                            </li>
+                            <li class="nav-item"><a href="{{ route('terms') }}" class="nav-link p-1">Terms & Conditions</a>
+                            </li>
+                            <li class="nav-item"><a href="{{ route('refund') }}" class="nav-link p-1">Refund Policy</a>
+                            </li>
+                        </ul>
+                    </div>
 
-                        <div class="col-lg-2 pt-4">
-                            <h5>Contact</h5>
-                            <p class="lead fs-5">Email: nd09079927615@gmail.com</p>
-                            <p class="lead fs-5">Phone: +234 901 197 3177</p>
-
-                        </div>
+                    <div class="col-lg-2 pt-4">
+                        <h5>Contact</h5>
+                        <p class="lead fs-5">Email: nd09079927615@gmail.com</p>
+                        <p class="lead fs-5">Phone: +234 901 197 3177</p>
 
                     </div>
+
+                    
                 </div>    
             </div>
 
@@ -664,10 +664,11 @@
                 <script>
                     document.write( new Date().getFullYear() )
                 </script>
-            </span> BillVexa.
+            </span> {{ $setting->site_name ?? 'BillVexa' }}.
             All rights reserved.
         </div>
-    </footer>        
+    </footer> 
+
     <script>
 
         const popup = document.getElementById("statusPopup");
