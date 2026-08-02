@@ -19,9 +19,9 @@ class Setting extends Model
         'session_timeout',
 
         'minimum_deposit',
-        'minimum_withdrawal',
-        'charges',
+        // 'minimum_withdrawal',
         'profit_percentage',
+        'discount',
 
         'airtime_api',
         'data_api',

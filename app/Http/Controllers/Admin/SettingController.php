@@ -45,7 +45,7 @@ class SettingController extends Controller
 
         'minimum_withdrawal'=>'required|numeric',
 
-        'charges'=>'required|numeric',
+        'discount' => 'required|numeric|min:0|max:100',
 
         'profit_percentage'=>'required|numeric',
 

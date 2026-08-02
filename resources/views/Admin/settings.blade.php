@@ -223,13 +223,21 @@
 
                     <div class="mb-3">
                         <label class="form-label">
-                            Charges (%)
+                            Discount (%)
                         </label>
+
                         <input
-                        name="charges"
+                        name="discount"
                         type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
                         class="form-control"
-                        value="{{ old('charges',$setting->charges) }}">
+                        value="{{ old('discount', $setting->discount) }}">
+
+                        <small class="text-muted">
+                            Percentage discount given to customers on every VTU purchase.
+                        </small>
                     </div>
 
                     <div>

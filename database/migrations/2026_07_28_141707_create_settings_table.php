@@ -31,9 +31,19 @@ return new class extends Migration
             // Transactions
             $table->decimal('minimum_deposit',15,2)->default(100);
             $table->decimal('minimum_withdrawal',15,2)->default(500);
-            $table->decimal('charges',8,2)->default(2);
-            $table->decimal('profit_percentage',8,2)->default(5);
-    
+            
+            // Discounts
+            $table->decimal('airtime_discount', 5, 2)->default(3.00);
+            $table->decimal('data_discount', 5, 2)->default(2.00);
+            $table->decimal('electricity_discount', 5, 2)->default(1.00);
+            $table->decimal('cable_discount', 5, 2)->default(1.50);
+            $table->decimal('betting_discount', 5, 2)->default(0.50);
+            $table->decimal('education_discount', 5, 2)->default(2.00);
+            $table->decimal('exam_discount', 5, 2)->default(2.00);
+
+            // Platform Profit
+            $table->decimal('profit_percentage', 5, 2)->default(5.00);
+                        
             // APIs
             $table->string('airtime_api')->nullable();
             $table->string('data_api')->nullable();

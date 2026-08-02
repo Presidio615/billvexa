@@ -570,7 +570,7 @@
 
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <!-- <div class="d-flex justify-content-between mb-3">
 
                         <span class="text-muted">
                             Service Charge
@@ -592,7 +592,7 @@
                             Instant
                         </strong>
 
-                    </div>
+                    </div> -->
 
                 </div>
 

@@ -888,11 +888,23 @@
                         </div>
 
                         <div class="alert alert-info mt-3 mb-0">
+
+                            <h6 class="fw-bold mb-2">
+                                Deposit Information
+                            </h6>
+
+                            <p class="mb-1">
+                                Minimum Deposit:
+                                <strong>
+                                    {{ $setting->currency }}{{ number_format($setting->minimum_deposit,2) }}
+                                </strong>
+                            </p> <hr>
                             <i class="bi bi-info-circle-fill me-2"></i>
                             Transfer money to the account above. Your wallet will be credited automatically after payment confirmation.
                         </div>
 
                     </div>
+                    
 
                 </div>
 
