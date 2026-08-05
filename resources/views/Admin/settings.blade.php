@@ -6,16 +6,47 @@
 
 @section('content')
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+<!-- Success Message -->
+@if(session('success'))
+
+    <div class="alert alert-success alert-dismissible fade show">
+
+        <i class="bi bi-check-circle-fill me-2"></i>
+
+        {{ session('success') }}
+
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+
     </div>
+
 @endif
 
+<!-- Error Message -->
+@if($errors->any())
+
+    <div class="alert alert-danger">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+        Please fix the following errors.
+
+        <hr>
+
+        <ul class="mb-0">
+
+            @foreach($errors->all() as $error)
+
+                <li>{{ $error }}</li>
+
+            @endforeach
+
+        </ul>
+
+    </div>
+
+@endif
+
+<!-- Settings Form -->
 <form action="{{ route('admin.settings.update') }}"
       method="POST"
       enctype="multipart/form-data">
@@ -30,9 +61,12 @@
             </p>
         </div>
 
-        <button type="submit" class="btn btn-primary px-4">
+        <button class="btn btn-primary btn-md shadow-sm">
+
             <i class="bi bi-check-circle-fill me-2"></i>
-            Save Changes
+
+            Save All Changes
+
         </button>
     </div>
 
@@ -199,6 +233,7 @@
 
                 <div class="card-body">
 
+                    <!-- Minimum Transaction Amounts -->
                     <div class="mb-3">
                         <label class="form-label">
                             Minimum Deposit
@@ -209,7 +244,7 @@
                         class="form-control"
                         value="{{ old('minimum_deposit',$setting->minimum_deposit) }}">
                     </div>
-
+                    
                     <div class="mb-3">
                         <label class="form-label">
                             Minimum Withdrawal
@@ -221,23 +256,121 @@
                         value="{{ old('minimum_withdrawal',$setting->minimum_withdrawal) }}">
                     </div>
 
+                    <!-- VTU Service Discounts -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            Discount (%)
-                        </label>
+                        <div class="card shadow-sm border-0">
 
-                        <input
-                        name="discount"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="100"
-                        class="form-control"
-                        value="{{ old('discount', $setting->discount) }}">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-percent me-2 text-success"></i>
+                                    VTU Service Discounts
+                                </h5>
 
-                        <small class="text-muted">
-                            Percentage discount given to customers on every VTU purchase.
-                        </small>
+                                <small class="text-muted">
+                                    Set customer discounts for each service.
+                                </small>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Airtime Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="airtime_discount"
+                                            value="{{ old('airtime_discount',$setting->airtime_discount) }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Data Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="data_discount"
+                                            value="{{ old('data_discount',$setting->data_discount) }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Electricity Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="electricity_discount"
+                                            value="{{ old('electricity_discount',$setting->electricity_discount) }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Cable TV Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="cable_discount"
+                                            value="{{ old('cable_discount',$setting->cable_discount) }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Betting Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="betting_discount"
+                                            value="{{ old('betting_discount',$setting->betting_discount) }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Education Pin Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="education_discount"
+                                            value="{{ old('education_discount',$setting->education_discount) }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">
+                                            Exam Pin Discount (%)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            class="form-control"
+                                            name="exam_discount"
+                                            value="{{ old('exam_discount',$setting->exam_discount) }}">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
                     </div>
 
                     <div>
@@ -434,6 +567,7 @@
 
     </div>
 
+    <!-- Contact Information Preview -->
     <div class="card shadow-sm border-0 mt-4">
 
         <div class="card-header bg-white">

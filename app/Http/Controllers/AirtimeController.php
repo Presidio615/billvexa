@@ -21,23 +21,32 @@ class AirtimeController extends Controller
 
         return view('BillVexa.Dashboard.Quick.airtime', compact('transactions'));
     }
-
     public function purchase(Request $request)
     {
         $request->validate([
             'network' => 'required',
-            'phone'   => 'required|digits:11',
-            'amount'  => 'required|numeric|min:50',
+            'phone' => 'required|digits:11',
+            'amount' => 'required|numeric|min:50',
         ]);
 
         $user = Auth::user();
 
-        if ($user->wallet_balance < $request->amount) {
+        // Get system settings
+        $setting = \App\Models\Setting::first();
 
-            return back()->with(
-                'error',
-                'Insufficient wallet balance.'
-            )->withInput();
+        // Airtime discount percentage
+        $discountPercent = $setting->airtime_discount ?? 0;
+
+        // Calculate discount
+        $discount = ($request->amount * $discountPercent) / 100;
+
+        // Amount user will actually pay
+        $amountToPay = $request->amount - $discount;
+
+        if ($user->wallet_balance < $amountToPay) {
+            return back()
+                ->with('error', 'Insufficient wallet balance.')
+                ->withInput();
         }
 
         DB::beginTransaction();
@@ -45,38 +54,42 @@ class AirtimeController extends Controller
         try {
 
             // Deduct wallet
-            $user->wallet_balance -= $request->amount;
+            $user->wallet_balance -= $amountToPay;
             $user->save();
 
             // Save transaction
             Transaction::create([
-
-                'user_id'   => $user->id,
-
+                'user_id' => $user->id,
                 'reference' => 'AIR-' . strtoupper(Str::random(10)),
+                'service' => 'Airtime',
+                'type' => $request->network,
+                'network' => $request->network,
+                'phone' => $request->phone,
 
-                'service'   => 'Airtime',
+                // Original airtime value
+                'amount' => $request->amount,
 
-                'type'      => $request->network,
+                // Discount received
+                'discount' => $discount,
 
-                'network'   => $request->network,
+                // Amount deducted from wallet
+                'total' => $amountToPay,
 
-                'phone'     => $request->phone,
-
-                'amount'    => $request->amount,
-
-                'status'    => 'Successful',
-
+                'status' => 'Successful',
             ]);
 
-            // Create notification
+            // Notification
             Notification::create([
                 'user_id' => $user->id,
-                'title'   => 'Airtime Purchase',
-                'message' => 'Your airtime purchase of ₦' .
-                            number_format($request->amount, 2) .
-                            ' was successful.',
-                'link' => route('history'),            
+                'title' => 'Airtime Purchase',
+                'message' => 'You purchased ₦' .
+                    number_format($request->amount, 2) .
+                    ' airtime and received ₦' .
+                    number_format($discount, 2) .
+                    ' discount. Amount deducted: ₦' .
+                    number_format($amountToPay, 2),
+
+                'link' => route('history'),
             ]);
 
             DB::commit();
@@ -89,10 +102,7 @@ class AirtimeController extends Controller
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                'Transaction failed.'
-            );
+            return back()->with('error', $e->getMessage());
         }
     }
-}
+}    

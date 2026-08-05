@@ -15,6 +15,10 @@ class Transaction extends Model
         'amount',
         'status',
         'reference',
+        'discount',
+
+        'total',
+    
     ];
 
     public function user()

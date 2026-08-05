@@ -340,17 +340,21 @@
         <!-- TOPBAR -->
         <div class="topbar d-flex justify-content-between align-items-center">
 
-            <div>
+<div>
+<h3 class="fw-bold mb-1">
+    Airtime Purchase
+</h3>
 
-                <h4 class="fw-bold mb-1">
-                    Airtime Dashboard
-                </h4>
+<p class="text-muted mb-0">
+    Purchase airtime instantly with automatic discounts.
+</p>
+</div>
 
-                <small class="text-muted">
-                    Recharge airtime
-                </small>
-
-            </div>
+<div class="text-end">
+<span class="badge bg-success fs-6 px-3 py-2">
+    {{ $setting->airtime_discount }}% Discount
+</span>
+</div>
         </div>
 
         <div class="row g-4">
@@ -524,8 +528,64 @@
                                 value="{{ old('amount') }}">
 
                             </div>
+                            <div class="card border-0 shadow-sm rounded-4 mt-4">
 
-                        </div>
+                                <div class="card-header bg-transparent border-0 pb-0">
+
+                                    <h6 class="fw-bold">
+                                        <i class="bi bi-receipt me-2"></i>
+                                        Purchase Summary
+                                    </h6>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="d-flex justify-content-between py-2">
+
+                                        <span class="text-muted">
+                                            Airtime Amount
+                                        </span>
+
+                                        <strong id="amountText">
+                                            ₦0.00
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="d-flex justify-content-between py-2">
+
+                                        <span class="text-success">
+                                            Discount ({{ $setting->airtime_discount }}%)
+                                        </span>
+
+                                        <strong class="text-success" id="discountText">
+                                            -₦0.00
+                                        </strong>
+
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="d-flex justify-content-between">
+
+                                        <h6 class="fw-bold">
+                                            Amount to Pay
+                                        </h6>
+
+                                        <h5 class="fw-bold text-primary" id="totalText">
+                                            ₦0.00
+                                        </h5>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>    
+
+
 
                         <!-- BUTTON -->
                         <button class="buy-btn w-100">
@@ -552,52 +612,88 @@
             <div class="col-lg-4">
 
                 <!-- QUICK INFO -->
-                <div class="custom-card mb-4">
+                <div class="custom-card">
 
                     <h5 class="fw-bold mb-4">
-                        Airtime Info
+                        <i class="bi bi-info-circle me-2"></i>
+                        Airtime Information
                     </h5>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    <div class="d-flex align-items-center mb-3">
 
-                        <span class="text-muted">
-                            Minimum Recharge
-                        </span>
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
 
-                        <strong>
-                            ₦50
-                        </strong>
+                        <div>
 
-                    </div>
+                            <strong>Instant Delivery</strong>
 
-                    <!-- <div class="d-flex justify-content-between mb-3">
+                            <div class="text-muted small">
+                                Airtime is delivered immediately.
+                            </div>
 
-                        <span class="text-muted">
-                            Service Charge
-                        </span>
-
-                        <strong>
-                            Free
-                        </strong>
+                        </div>
 
                     </div>
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex align-items-center mb-3">
 
-                        <span class="text-muted">
-                            Delivery Time
-                        </span>
+                        <i class="bi bi-percent text-primary me-3 fs-5"></i>
 
-                        <strong>
-                            Instant
-                        </strong>
+                        <div>
 
-                    </div> -->
+                            <strong>{{ $setting->airtime_discount }}% Discount</strong>
+
+                            <div class="text-muted small">
+                                Save money on every airtime purchase.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <i class="bi bi-wallet2 text-warning me-3 fs-5"></i>
+
+                        <div>
+
+                            <strong>
+                                Minimum Recharge
+                            </strong>
+
+                            <div class="text-muted small">
+
+                                ₦{{ number_format($setting->minimum_deposit) }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex align-items-center">
+
+                        <i class="bi bi-clock-history text-info me-3 fs-5"></i>
+
+                        <div>
+
+                            <strong>
+                                24/7 Service
+                            </strong>
+
+                            <div class="text-muted small">
+                                Available every day of the week.
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
+
                 <!-- RECENT -->
-                <div class="custom-card">
+                <div class="custom-card mt-3">
 
                     <div class="d-flex justify-content-between mb-4">
 
@@ -612,39 +708,48 @@
 
                     </div>
 
-                    @foreach($transactions as $transaction)
+                    <div class="list-group list-group-flush">
 
-                        <div class="transaction-item d-flex justify-content-between">
+                        @foreach($transactions as $transaction)
 
-                            <div>
+                            <div class="list-group-item border-0 px-0">
 
-                                <h6>
+                                <div class="d-flex justify-content-between">
 
-                                    {{ $transaction->network }} Recharge
+                                    <div class="row small">
 
-                                </h6>
+                                        <div class="col-6 text-muted">
+                                            Airtime Amount
+                                        </div>
 
-                                <small>
+                                        <div class="col-6 text-end fw-bold">
+                                            ₦{{ number_format($transaction->amount,2) }}
+                                        </div>
 
-                                    {{ $transaction->created_at->diffForHumans() }}
+                                        <div class="col-6 text-success">
+                                            Discount
+                                        </div>
 
-                                </small>
+                                        <div class="col-6 text-end text-success fw-bold">
+                                            -₦{{ number_format($transaction->discount,2) }}
+                                        </div>
+
+                                        <div class="col-6 fw-bold">
+                                            Amount Paid
+                                        </div>
+
+                                        <div class="col-6 text-end fw-bold text-primary">
+                                            ₦{{ number_format($transaction->total,2) }}
+                                        </div>
+
+                                    </div>
+                                </div>
 
                             </div>
 
-                            <strong>
-
-                                ₦{{ number_format($transaction->amount) }}
-
-                            </strong>
-
-                        </div>
-
-                    @endforeach
-
-                   
-
-                </div>
+                        @endforeach
+                    </div>
+                </div>        
 
             </div>
 
@@ -682,20 +787,58 @@
 
 
     <script>
-        const labels = document.querySelectorAll('.network-card');
 
-        labels.forEach(label => {
+const labels = document.querySelectorAll('.network-card');
 
-            label.addEventListener('click', function () {
+labels.forEach(label => {
 
-                labels.forEach(l => l.classList.remove('clicked'));
+    label.addEventListener('click', function () {
 
-                this.classList.add('clicked');
+        labels.forEach(l => l.classList.remove('clicked'));
 
-            });
+        this.classList.add('clicked');
 
+    });
+
+});
+
+const amountInput = document.querySelector('input[name="amount"]');
+
+const discount = {{ $setting->airtime_discount ?? 0 }};
+
+function calculate() {
+
+    let amount = parseFloat(amountInput.value) || 0;
+
+    let discountAmount = amount * (discount / 100);
+
+    let total = amount - discountAmount;
+
+    document.getElementById('amountText').innerHTML =
+        "₦" + amount.toLocaleString(undefined,{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
         });
-    </script>
+
+    document.getElementById('discountText').innerHTML =
+        "-₦" + discountAmount.toLocaleString(undefined,{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
+
+    document.getElementById('totalText').innerHTML =
+        "₦" + total.toLocaleString(undefined,{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
+
+}
+
+amountInput.addEventListener('input', calculate);
+
+calculate();
+
+</script>
 
 </body>
 </html>

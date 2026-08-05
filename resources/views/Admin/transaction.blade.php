@@ -265,7 +265,7 @@
 
                         <td>{{ $transaction->service }}</td>
 
-                        <td>₦{{ number_format($transaction->amount,2) }}</td>
+                        <td>₦{{ number_format($transaction->total, 2) }}</td>
 
                         <td>₦{{ number_format($transaction->profit,2) }}</td>
 

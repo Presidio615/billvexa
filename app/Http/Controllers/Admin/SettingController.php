@@ -45,7 +45,13 @@ class SettingController extends Controller
 
         'minimum_withdrawal'=>'required|numeric',
 
-        'discount' => 'required|numeric|min:0|max:100',
+        'airtime_discount'     => 'required|numeric|min:0|max:100',
+        'data_discount'        => 'required|numeric|min:0|max:100',
+        'electricity_discount' => 'required|numeric|min:0|max:100',
+        'cable_discount'       => 'required|numeric|min:0|max:100',
+        'betting_discount'     => 'required|numeric|min:0|max:100',
+        'education_discount'   => 'required|numeric|min:0|max:100',
+        'exam_discount'        => 'required|numeric|min:0|max:100',
 
         'profit_percentage'=>'required|numeric',
 

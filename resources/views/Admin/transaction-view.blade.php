@@ -61,7 +61,7 @@
                         <div class="col-md-6">
                             <strong>Amount</strong>
                             <h4 class="text-primary">
-                                ₦{{ number_format($transaction->amount,2) }}
+                            ₦{{ number_format($transaction->total, 2) }}
                             </h4>
                         </div>
 
