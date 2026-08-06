@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('transactions', function (Blueprint $table) {
             //
-            // $table->decimal('profit', 15, 2)->default(0);
+            $table->decimal('profit', 12, 2)->default(0)->after('total');
         });
     }
 
@@ -24,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('transactions', function (Blueprint $table) {
             //
+            $table->dropColumn('profit');
         });
     }
 };

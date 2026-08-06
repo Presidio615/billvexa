@@ -16,7 +16,7 @@ class Transaction extends Model
         'status',
         'reference',
         'discount',
-
+        'profit',
         'total',
     
     ];
