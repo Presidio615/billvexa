@@ -374,9 +374,29 @@
     <!-- DESKTOP SIDEBAR -->
     <div class="sidebar d-none d-lg-flex flex-column">
 
-        <div class="logo mb-5 text-white fs-2 fw-bold">
+    
+        <h4 class="mb-4 d-flex align-items-center logo mb-5 text-white fs-2 fw-bold">
+
+            @if($setting && $setting->logo)
+
+                <img src="{{ asset('storage/'.$setting->logo) }}"
+                    width="40"
+                    height="40"
+                    class="rounded me-2">
+
+            @else
+
+                <i class="bi bi-grid me-2"></i>
+
+            @endif
+
             {{ $setting->site_name ?? 'BillVexa' }}
-        </div>
+
+        </h4>
+
+        <!-- <div class="logo mb-5 text-white fs-2 fw-bold">
+            {{ $setting->site_name ?? 'BillVexa' }}
+        </div> -->
 
         <a href="{{ route('dashboard') }}" class="active">
             <i class="bi bi-grid-fill"></i>
@@ -455,60 +475,15 @@
 
             <div class="d-flex align-items-center gap-3">
 
-                <div class="dropdown">
-
-                    <button
-                        id="notificationDropdown"
-                        class="btn btn-light position-relative"
-                        type="button"
-                        data-bs-toggle="dropdown">
-
-                        <i class="fa-solid fa-bell"></i>
-
-                        @if($unreadNotifications > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ $unreadNotifications }}
-                            </span>
-                        @endif
-
-                    </button>
-
-                    <ul class="dropdown-menu dropdown-menu-end shadow" style="width:350px;">
-
-                        <li>
-                            <h6 class="dropdown-header">Notifications</h6>
-                        </li>
-
-                        @forelse($notifications as $notification)
-
-                            <li>
-                                <a href="{{ route('notifications.read', $notification->id) }}"
-                                class="dropdown-item notification-message {{ !$notification->is_read ? 'fw-bold bg-light' : '' }}">
-
-                                    <strong>{{ $notification->title }}</strong><br>
-
-                                    <small> {{ \Illuminate\Support\Str::limit($notification->message, 60) }}</small><br>
-
-                                    <small class="text-muted">
-                                        {{ $notification->created_at->diffForHumans() }}
-                                    </small>
-
-                                </a>
-                            </li>
-
-                        @empty
-
-                            <li>
-                                <span class="dropdown-item">
-                                    No notifications
-                                </span>
-                            </li>
-
-                        @endforelse
-
-                    </ul>
-
-                </div>
+               <a href="{{ route('notification') }}" class="btn btn-light position-relative" >
+                    <i class="fa-solid fa-bell"></i>
+                    @if ($unreadNotifications > 0) 
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ $unreadNotifications }}
+                        </span>
+                    
+                    @endif
+               </a>
 
                 <img src="{{ auth()->user()->profile_photo
                 ? asset('storage/' . auth()->user()->profile_photo)

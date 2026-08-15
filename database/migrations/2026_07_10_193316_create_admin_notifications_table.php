@@ -27,6 +27,28 @@ return new class extends Migration
         $table->string('link')->nullable();
     
         $table->boolean('is_read')->default(false);
+
+        $table->enum('recipient_type', [
+            'everyone',
+            'user',
+            'role'
+        ]);
+        $table->string('recipient')->nullable();
+
+        $table->boolean('push')->default(true);
+
+        $table->boolean('email')->default(false);
+
+        $table->boolean('sms')->default(false);
+
+        $table->enum('status', [
+            'Pending',
+            'Sent',
+            'Failed'
+        ])->default('Pending');
+
+        $table->unsignedBigInteger('created_by');
+
     
         $table->timestamps();
     

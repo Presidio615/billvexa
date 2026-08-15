@@ -8,6 +8,8 @@ use App\Models\Deposit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AdminNotification;
+use App\Models\AuditLog;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -39,24 +41,26 @@ class AdminController extends Controller
     {
         return view('admin.user-create');
     }
+        public function readAll()
+    {
+        return view('admin.notification.read-all');
+    }
 
     public function storeUser(Request $request)
 {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'phone' => 'nullable|string|max:20',
-        'password' => 'required|min:8',
-    ]);
-
-    User::create([
+    $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'phone' => $request->phone,
         'password' => Hash::make($request->password),
         'wallet_balance' => 0,
     ]);
-
+    
+    AuditLogController::record(
+        'User Created',
+        "Created user {$user->name} ({$user->email})"
+    );
+    
     return redirect()
         ->route('admin.user')
         ->with('success', 'User created successfully.');
@@ -153,6 +157,11 @@ public function updateUser(Request $request, User $user)
         'phone' => $request->phone,
     ]);
 
+    AuditLogController::record(
+        'User Updated',
+        "Updated {$user->name}'s profile"
+    );
+
     return redirect()
         ->route('admin.user')
         ->with('success', 'User updated successfully.');
@@ -167,7 +176,15 @@ public function showUser(User $user)
 
 public function deleteUser(User $user)
 {
+    $name = $user->name;
+    $email = $user->email;
+
     $user->delete();
+
+    AuditLogController::record(
+        'User Deleted',
+        "Deleted user {$name} ({$email})"
+    );
 
     return redirect()
         ->route('admin.user')
@@ -197,6 +214,7 @@ public function transactions(Request $request)
     }
 
     $transactions = $query->latest()->paginate(15);
+    
 
     return view('admin.transaction', [
 
@@ -248,14 +266,29 @@ public function approveTransaction(Transaction $transaction)
     });
 
     // Notify the admin dashboard
+    $admin = auth('admin')->user();
+
     AdminNotification::create([
-        'admin_id' => auth('admin')->id(),
+        'admin_id' => $admin->id,
+        'created_by' => $admin->id,
         'title' => 'Transaction Approved',
-        'message' => auth('admin')->user()->name .
+        'message' => $admin->name .
                     ' approved transaction ' .
                     $transaction->reference,
         'link' => route('admin.transaction.show', $transaction),
+        'recipient_type' => 'admin',
+        'recipient' => (string) $admin->id,
+        'push' => true,
+        'email' => false,
+        'sms' => false,
+        'status' => 'Sent',
+        'is_read' => false,
     ]);
+
+    AuditLogController::record(
+        'Transaction Approved',
+        "Approved transaction {$transaction->reference}"
+    );
 
     return back()->with(
         'success',
@@ -265,77 +298,229 @@ public function approveTransaction(Transaction $transaction)
 
 public function reverseTransaction(Transaction $transaction)
 {
-    if ($transaction->status != 'successful') {
-        return back()->with('error', 'Only successful transactions can be reversed.');
+    if ($transaction->status !== 'successful') {
+        return back()->with(
+            'error',
+            'Only successful transactions can be reversed.'
+        );
     }
 
     DB::transaction(function () use ($transaction) {
 
         $user = $transaction->user;
-        
-        // Credit wallet
-        $user->wallet_balance += $transaction->amount;
+        $admin = auth('admin')->user();
 
-        $user->save();
-        
-        // Update transaction
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate actual refundable amount
+        |--------------------------------------------------------------------------
+        */
+
+        $originalAmount = (float) $transaction->amount;
+
+        $discount = $originalAmount * 0.02;
+
+        $reverseAmount = $originalAmount - $discount;
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Credit actual amount back to user's wallet
+        |--------------------------------------------------------------------------
+        */
+
+        $user->increment(
+            'wallet_balance',
+            $reverseAmount
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Mark transaction as reversed
+        |--------------------------------------------------------------------------
+        */
+
         $transaction->update([
             'status' => 'reversed',
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Notify admin
+        |--------------------------------------------------------------------------
+        */
 
-        // Notify the admin dashboard
         AdminNotification::create([
-            'admin_id' => auth('admin')->id(),
+            'admin_id' => $admin->id,
+            'created_by' => $admin->id,
             'title' => 'Transaction Reversed',
-            'message' => auth('admin')->user()->name .
-                         ' reversed transaction ' .
-                         $transaction->reference,
-            'link' => route('admin.transaction.show', $transaction),
+            'message' => $admin->name .
+                         ' reversed ₦' .
+                         number_format($reverseAmount, 2) .
+                         ' for ' .
+                         $user->name,
+            'link' => route(
+                'admin.transaction.show',
+                $transaction
+            ),
+            'recipient_type' => 'admin',
+            'recipient' => (string) $admin->id,
+            'push' => true,
+            'email' => false,
+            'sms' => false,
+            'status' => 'Sent',
+            'is_read' => false,
         ]);
 
     });
 
-    return back()->with('success', 'Transaction reversed successfully. User wallet has been credited.');
+    /*
+    |--------------------------------------------------------------------------
+    | Audit Log
+    |--------------------------------------------------------------------------
+    */
+
+    $user = $transaction->user;
+
+    $originalAmount = (float) $transaction->amount;
+    $discount = $originalAmount * 0.02;
+    $reverseAmount = $originalAmount - $discount;
+
+    AuditLogController::record(
+        'Transaction Reversed',
+        "Reversed ₦" .
+        number_format($reverseAmount, 2) .
+        " for {$user->name}"
+    );
+
+    return back()->with(
+        'success',
+        'Transaction reversed successfully. The actual deducted amount has been credited back to the user.'
+    );
 }
 
 public function refundTransaction(Transaction $transaction)
 {
-    if ($transaction->status != 'successful') {
-        return back()->with('error', 'Only successful transactions can be refunded.');
+    if ($transaction->status !== 'successful') {
+        return back()->with(
+            'error',
+            'Only successful transactions can be refunded.'
+        );
     }
 
     DB::transaction(function () use ($transaction) {
 
         $user = $transaction->user;
-            
-        // Credit wallet
-        $user->wallet_balance += $transaction->amount;
+        $admin = auth('admin')->user();
 
-        $user->save();
+
+
         
-        // Update transaction
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate actual refundable amount
+        |--------------------------------------------------------------------------
+        | Original transaction: ₦100
+        | 2% deduction:        ₦2
+        | Actual refund:       ₦98
+        |--------------------------------------------------------------------------
+        */
+
+        $originalAmount = (float) $transaction->amount;
+
+        $discount = $originalAmount * 0.02;
+
+        $refundAmount = $originalAmount - $discount;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Credit the user's wallet
+        |--------------------------------------------------------------------------
+        */
+        $user->increment(
+            'wallet_balance',
+            $refundAmount
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Mark the transaction as refunded
+        |--------------------------------------------------------------------------
+        */
         $transaction->update([
             'status' => 'refunded',
         ]);
 
-
-        
-        // Notify the admin dashboard
-        AdminNotification::create([
-            'admin_id' => auth('admin')->id(), // optional but recommended
-            'title' => 'Refund Processed',
-            'message' => auth('admin')->user()->name .
-                         ' refunded ₦' .
-                         number_format($transaction->amount, 2) .
-                         ' to ' . $transaction->user->name,
-            'link' => route('admin.transaction.show', $transaction),
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Notify the USER
+        |--------------------------------------------------------------------------
+        */
+        Notification::create([
+            'user_id' => $user->id,
+            'title' => 'Refund Successful',
+            'message' => 'Your refund of ₦' .
+                number_format($transaction->amount, 2) .
+                ' has been processed successfully.',
+            'link' => url('/dashboard/history'),
+            'is_read' => false,
         ]);
 
-
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Notify the ADMIN
+        |--------------------------------------------------------------------------
+        */
+        AdminNotification::create([
+            'admin_id' => $admin->id,
+            'created_by' => $admin->id,
+            'title' => 'Refund Processed',
+            'message' => $admin->name .
+                ' refunded ₦' .
+                number_format($transaction->amount, 2) .
+                ' to ' .
+                $user->name,
+            'link' => route(
+                'admin.transaction.show',
+                $transaction
+            ),
+            'recipient_type' => 'admin',
+            'recipient' => (string) $admin->id,
+            'push' => true,
+            'email' => false,
+            'sms' => false,
+            'status' => 'Sent',
+            'is_read' => false,
+        ]);
     });
 
-    return back()->with('success', 'Transaction refunded successfully. User wallet has been credited.');
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Audit Log
+    |--------------------------------------------------------------------------
+    */
+
+    $user = $transaction->user;
+
+    $originalAmount = (float) $transaction->amount;
+    $discount = $originalAmount * 0.02;
+    $refundAmount = $originalAmount - $discount;
+
+
+    $user = $transaction->user;
+
+    AuditLogController::record(
+        'Transaction Refunded',
+        "Refunded ₦" .
+        number_format($transaction->amount, 2) .
+        " to {$user->name}"
+    );
+
+    return back()->with(
+        'success',
+        'Transaction refunded successfully. User wallet has been credited with the actual refundable amount.'
+    );
 }
     public function services()
     {
@@ -418,12 +603,11 @@ public function refundTransaction(Transaction $transaction)
 
     public function creditWallet(Request $request, User $user)
 {
-    $request->validate([
-        'amount' => 'required|numeric|min:1',
-    ]);
-
-    $user->increment('wallet_balance', $request->amount);
-
+    $user->increment(
+        'wallet_balance',
+        $request->amount
+    );
+    
     Transaction::create([
         'user_id'   => $user->id,
         'service'   => 'Admin Wallet Credit',
@@ -434,6 +618,12 @@ public function refundTransaction(Transaction $transaction)
         'status'    => 'Successful',
         'reference' => 'CR-' . strtoupper(Str::random(10)),
     ]);
+    
+    AuditLogController::record(
+        'Wallet Credited',
+        "Credited ₦" . number_format($request->amount, 2) .
+        " to {$user->name}"
+    );
 
     return back()->with('success', 'Wallet credited successfully.');
 }
@@ -460,6 +650,12 @@ public function debitWallet(Request $request, User $user)
         'status'    => 'Successful',
         'reference' => 'DR-' . strtoupper(Str::random(10)),
     ]);
+
+    AuditLogController::record(
+        'Wallet Debited',
+        "Debited ₦" . number_format($request->amount, 2) .
+        " from {$user->name}"
+    );
 
     return back()->with('success', 'Wallet debited successfully.');
 }
@@ -552,6 +748,13 @@ public function approveDeposit(Deposit $deposit)
 
     });
 
+    AuditLogController::record(
+        'Deposit Approved',
+        "Approved ₦" .
+        number_format($deposit->amount, 2) .
+        " deposit for {$deposit->user->name}"
+    );
+
     return back()->with('success','Deposit approved.');
 }
 
@@ -572,6 +775,13 @@ public function rejectDeposit(Request $request, Deposit $deposit)
         'approved_at'=>now()
 
     ]);
+
+    AuditLogController::record(
+        'Deposit Rejected',
+        "Rejected ₦" .
+        number_format($deposit->amount, 2) .
+        " deposit for {$deposit->user->name}"
+    );
 
     return back()->with('success','Deposit rejected.');
 }

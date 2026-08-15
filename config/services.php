@@ -56,4 +56,14 @@ return [
 
 ],
 
+'termii' => [
+    'key' => env('tlv_81pbpElcIkLnmNvfU4cbMOmjLeXjiynPyxLHlUv06Nk'),
+],
+
+'termii' => [
+    'key' => env('TERMII_API_KEY','tlv_FmqD2iFBelSvqFt_02fBCOvJHQRmE0MDlJphgspa4dA'),
+    'base_url' => env('TERMII_BASE_URL', 'https://api.ng.termii.com'),
+],
+
+
 ];

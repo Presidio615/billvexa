@@ -39,7 +39,7 @@ class TransactionController extends Controller
         ->latest()
         ->paginate(5);
 
-        return view('admin.transactions', [
+        return view('admin.transaction', [
 
             'transactions' => $transactions,
 

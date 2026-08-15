@@ -236,8 +236,8 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.log') ? 'active' : '' }}"
-                   href="{{ route('admin.logs') }}">
+                <a class="nav-link {{ request()->routeIs('admin.audit-logs.index') ? 'active' : '' }}"
+                   href="{{ route('admin.audit-logs.index') }}">
                     <i class="bi bi-shield-check me-2"></i>
                     Logs
                 </a>
@@ -276,7 +276,7 @@
                 <li><a class="nav-link" href="{{ route('admin.report') }}">Report</a></li>
                 <li><a class="nav-link" href="{{ route('admin.setting') }}">Settings</a></li>
                 <li><a class="nav-link" href="{{ route('admin.notification') }}">Notification</a></li>
-                <li><a class="nav-link" href="{{ route('admin.logs') }}">Logs</a></li>
+                <li><a class="nav-link" href="{{ route('admin.audit-logs.index') }}">Logs</a></li>
 
             </ul>
 
@@ -300,7 +300,7 @@
 
                 </button>
 
-                <div>
+                <div class="pb-3">
 
                     <h4 class="fw-bold mb-0">
                         @yield('page-title')
@@ -351,82 +351,18 @@
 
                 </div>
 
-                <div class="dropdown me-2">
+                <a href="{{ route('admin.notification.read-all') }}"
+                class="btn btn-light position-relative rounded-pill mx-3">
 
-                    <button class="btn btn-light rounded-circle position-relative"
-                            data-bs-toggle="dropdown">
+                    <i class="bi bi-bell fs-5"></i>
 
-                        <i class="bi bi-bell fs-5"></i>
+                    @if($notificationCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ $notificationCount }}
+                        </span>
+                    @endif
 
-                        @if($notificationCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ $notificationCount }}
-                            </span>
-                        @endif
-
-                    </button>
-
-                    <ul class="dropdown-menu dropdown-menu-end shadow p-0" style="width:380px; max-height:450px; overflow-y:auto;">
-
-                        <li class="dropdown-header fw-bold border-bottom py-3">
-                            Transaction Notifications
-                        </li>
-
-                        @forelse($notifications as $notification)
-
-                            <li>
-                            {{ $notification->link }}
-
-                                <a href="{{ $notification->link ?? '#' }}"
-                                class="dropdown-item py-3">
-
-                                    <div class="d-flex justify-content-between">
-
-                                        <strong>{{ $notification->title }}</strong>
-
-                                        @if(!$notification->is_read)
-                                            <span class="badge bg-danger">New</span>
-                                        @endif
-
-                                    </div>
-
-                                    <small class="text-muted d-block mt-1">
-                                        {{ \Illuminate\Support\Str::limit($notification->message,80) }}
-                                    </small>
-
-                                    <small class="text-secondary">
-                                        {{ $notification->created_at->diffForHumans() }}
-                                    </small>
-
-                                </a>
-
-                            </li>
-
-                            @if(!$loop->last)
-                                <li><hr class="dropdown-divider m-0"></li>
-                            @endif
-
-                        @empty
-
-                            <li class="text-center py-4 text-muted">
-                                <i class="bi bi-bell-slash fs-2"></i><br>
-                                No transaction notifications
-                            </li>
-
-                        @endforelse
-
-                        <li><hr class="dropdown-divider m-0"></li>
-
-                        <li>
-                            <a href="{{ route('admin.transaction') }}"
-                            class="dropdown-item text-center fw-semibold py-2">
-                                View All Notifications
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </div>
+                </a>
                 <!-- Settings -->
 
                 <a href="{{ route('admin.setting') }}"
@@ -536,7 +472,7 @@
                         </li>
 
                         <li>
-                            <a href="{{ route('admin.logs') }}" class="dropdown-item">
+                            <a href="{{ route('admin.audit-logs.index') }}" class="dropdown-item">
                                 <i class="bi bi-clock-history me-2"></i>
                                 Activity Logs
                             </a>

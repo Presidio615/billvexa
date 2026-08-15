@@ -13,6 +13,7 @@ use App\Http\Controllers\KycController;
 use App\Http\Controllers\Admin\KycController as AdminKycController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\Admin\ReportController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Models\Transaction;
 use App\Models\BankAccount;
 
@@ -199,6 +201,41 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard/history', [TransactionController::class, 'index'])
         ->name('history');
+    
+        /*
+    |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/dashboard/notifications', [
+        NotificationController::class,
+        'index'
+    ])->name('notification');
+
+    Route::post('/dashboard/notifications/{id}/read', [
+        NotificationController::class,
+        'markAsRead'
+    ])->name('notification.read');
+
+    Route::post('/dashboard/notifications/read-all', [
+        NotificationController::class,
+        'markAllAsRead'
+    ])->name('notification.readAll');
+
+    Route::delete('/dashboard/notifications/clear-read', [
+        NotificationController::class,
+        'clearRead'
+    ])->name('notification.clearRead');
+
+    Route::delete('/dashboard/notifications/{id}', [
+        NotificationController::class,
+        'destroy'
+    ])->name('notification.delete');
+
+    Route::get('/dashboard/notifications/count', [
+        NotificationController::class,
+        'count'
+    ])->name('notification.count');
 
     /*
     |--------------------------------------------------------------------------
@@ -397,24 +434,25 @@ Route::get('/notifications/read/{notification}', [NotificationController::class,
             Route::get('/users', [AdminController::class, 'users'])
                 ->name('user');
     
-                Route::get('/transactions', [AdminController::class, 'transactions'])
+                Route::get('/transactions', [AdminTransactionController::class, 'index'])
                 ->name('transaction');
 
-                Route::get('/transactions/export', [AdminController::class, 'exportTransactions'])
-    ->name('transaction.export');
+                Route::get('/transactions/export', [AdminTransactionController::class, 'exportTransactions'])
+                ->name('transaction.export');
             
-            Route::get('/transactions/{transaction}', [AdminController::class, 'showTransaction'])
+            Route::get('/transactions/{transaction}', [AdminTransactionController::class, 'show'])
                 ->name('transaction.show');
             
-            Route::post('/transactions/{transaction}/approve', [AdminController::class, 'approveTransaction'])
+            Route::post('/transactions/{transaction}/approve', [AdminTransactionController::class, 'approve'])
                 ->name('transaction.approve');
             
-            Route::post('/transactions/{transaction}/reverse', [AdminController::class, 'reverseTransaction'])
+            Route::post('/transactions/{transaction}/reverse', [AdminTransactionController::class, 'reverse'])
                 ->name('transaction.reverse');
             
-            Route::post('/transactions/{transaction}/refund', [AdminController::class, 'refundTransaction'])
+            Route::post('/transactions/{transaction}/refund', [AdminTransactionController::class, 'refund'])
                 ->name('transaction.refund');
-    
+            
+          
             Route::get('/wallet', [AdminController::class, 'wallet'])
                 ->name('wallet');
     
@@ -493,12 +531,25 @@ Route::get('/notifications/read/{notification}', [NotificationController::class,
                 [ReportController::class,'export'])
                 ->name('reports.export');
     
-            Route::get('/notifications', [AdminController::class, 'notifications'])
-                ->name('notification');
+                Route::get(
+                    '/notifications',
+                    [AdminNotificationController::class,'index']
+                )->name('notification');
+
+                Route::get('/notification/read-all', [AdminNotificationController::class, 'readAll'])
+    ->name('notification.read-all');
+        
+                Route::post(
+                    '/notifications',
+                    [AdminNotificationController::class,'store']
+                )->name('notifications.store');
+        
 
 
-            Route::get('/logs', [AdminController::class, 'logs'])
-                ->name('logs');
+                Route::get('/audit-logs', [
+                    AuditLogController::class,
+                    'index'
+                ])->name('audit-logs.index');
     
             Route::get('/search', [AdminController::class, 'search'])
                 ->name('search');

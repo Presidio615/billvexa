@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\AuditLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
@@ -75,6 +76,11 @@ class AdminAuthController extends Controller
         ]);
     
         $request->session()->regenerate();
+
+        AuditLogController::record(
+            'Login',
+            'Administrator logged into dashboard'
+        );
     
         return redirect()
             ->route('admin.dashboard')
@@ -82,14 +88,23 @@ class AdminAuthController extends Controller
     }
     public function logout(Request $request)
     {
+        $admin = Auth::guard('admin')->user();
+    
+        if ($admin) {
+            AuditLogController::record(
+                'Logout',
+                'Administrator logged out'
+            );
+        }
+    
         Auth::guard('admin')->logout();
-
+    
         $request->session()->invalidate();
-
+    
         $request->session()->regenerateToken();
-
+    
         return redirect()
-        ->route('admin.login')
-        ->with('success', 'You have been logged out successfully.');
+            ->route('admin.login')
+            ->with('success', 'You have been logged out successfully.');
     }
 }

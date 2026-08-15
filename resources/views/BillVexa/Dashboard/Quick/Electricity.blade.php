@@ -301,9 +301,24 @@
 <!-- DESKTOP SIDEBAR -->
     <div class="sidebar d-none d-lg-flex flex-column">
 
-        <div class="logo mb-5 text-white fs-2 fw-bold">
+        <h4 class="mb-4 d-flex align-items-center logo mb-5 text-white fs-2 fw-bold">
+
+            @if($setting && $setting->logo)
+
+                <img src="{{ asset('storage/'.$setting->logo) }}"
+                    width="40"
+                    height="40"
+                    class="rounded me-2">
+
+            @else
+
+                <i class="bi bi-grid me-2"></i>
+
+            @endif
+
             {{ $setting->site_name ?? 'BillVexa' }}
-        </div>
+
+        </h4>
 
         <a href={{ route('dashboard') }}>
             <i class="bi bi-grid-fill"></i>

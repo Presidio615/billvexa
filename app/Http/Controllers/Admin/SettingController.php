@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Http\Controllers\Admin\AuditLogController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
@@ -96,6 +97,11 @@ class SettingController extends Controller
         }
 
         $setting->update($data);
+
+        AuditLogController::record(
+            'Settings Changed',
+            'Updated platform settings'
+        );
 
         return back()->with('success','Settings updated successfully.');
     }

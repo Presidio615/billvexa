@@ -150,7 +150,7 @@
 
                             <td>{{ ucfirst($transaction->service) }}</td>
 
-                            <td>{{ $setting->currency }}{{ number_format($transaction->amount,2) }}</td>
+                            <td>{{ $setting->currency }}{{ number_format($transaction->total, 2) }}</td>
 
                             <td>
 
@@ -254,7 +254,7 @@
 
                     {{ $activity->service }}
 
-                    {{ $setting->currency }}{{ number_format($activity->amount) }}
+                    {{ $setting->currency }}{{ number_format($activity->total, 2) }}
 
                 </p>
 

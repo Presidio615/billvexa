@@ -24,42 +24,45 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $setting = Setting::first();
-    
-        if (!$setting) {
-            $setting = Setting::create([]);
-        }
-    
-        View::share('setting', $setting);
-    
-        View::composer('layouts.admin', function ($view) {
-    
-            $admin = Auth::guard('admin')->user();
-    
-            if ($admin) {
-    
-                $notifications = AdminNotification::latest()
-                    ->take(10)
-                    ->get();
-    
-                $notificationCount = AdminNotification::where('is_read', false)
-                    ->count();
-    
-            } else {
-    
-                $notifications = collect();
-                $notificationCount = 0;
-    
+            $setting = Setting::first();
+        
+            if (!$setting) {
+                $setting = Setting::create([]);
             }
-    
-            $view->with([
-                'admin' => $admin,
-                'notifications' => $notifications,
-                'notificationCount' => $notificationCount,
-            ]);
-        });
-    
+        
+            View::share('setting', $setting);
+        
+            View::composer('layouts.admin', function ($view) {
+
+        $admin = Auth::guard('admin')->user();
+
+        if ($admin) {
+
+            // Get latest notifications
+            $notifications = AdminNotification::latest()
+                ->take(10)
+                ->get();
+
+            // Count ONLY unread notifications
+            $notificationCount = AdminNotification::where('is_read', false)
+                ->count();
+
+        } else {
+
+            $notifications = collect();
+            $notificationCount = 0;
+
+        }
+
+        $view->with([
+            'admin' => $admin,
+            'notifications' => $notifications,
+            'notificationCount' => $notificationCount,
+        ]);
+    });
         config(['app.timezone' => $setting->timezone]);
         date_default_timezone_set($setting->timezone);
     }
+
+    
 }

@@ -30,7 +30,7 @@
                     Total Logs
                 </h6>
 
-                <h2>15,642</h2>
+                <h2>{{ number_format($totalLogs) }}</h2>
 
                 <small class="text-primary">
                     All Activities
@@ -52,7 +52,7 @@
                     Today's Activities
                 </h6>
 
-                <h2>324</h2>
+                <h2>{{ number_format($todayActivities) }}</h2>
 
                 <small class="text-success">
                     Live Updates
@@ -74,7 +74,7 @@
                     Admin Logins
                 </h6>
 
-                <h2>48</h2>
+                <h2>{{ number_format($adminLogins) }}</h2>
 
                 <small class="text-info">
                     Today
@@ -96,7 +96,7 @@
                     Settings Changes
                 </h6>
 
-                <h2>12</h2>
+                <h2>{{ number_format($settingsChanges) }}</h2>
 
                 <small class="text-warning">
                     Recent
@@ -115,74 +115,111 @@
 
     <div class="card-body">
 
-        <div class="row g-3">
+        <form method="GET" action="{{ route('admin.audit-logs.index') }}">
 
-            <div class="col-lg-4">
+            <div class="row g-3">
 
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Search logs...">
+                <div class="col-lg-4">
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        class="form-control"
+                        placeholder="Search logs..."
+                    >
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <select
+                        name="activity"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            All Activities
+                        </option>
+
+                        <option
+                            value="Login"
+                            @selected(request('activity') === 'Login')
+                        >
+                            Login
+                        </option>
+
+                        <option
+                            value="Logout"
+                            @selected(request('activity') === 'Logout')
+                        >
+                            Logout
+                        </option>
+
+                        <option
+                            value="User Updated"
+                            @selected(request('activity') === 'User Updated')
+                        >
+                            User Updated
+                        </option>
+
+                        <option
+                            value="Wallet Credited"
+                            @selected(request('activity') === 'Wallet Credited')
+                        >
+                            Wallet Credited
+                        </option>
+
+                        <option
+                            value="Withdrawal Approved"
+                            @selected(request('activity') === 'Withdrawal Approved')
+                        >
+                            Withdrawal Approved
+                        </option>
+
+                        <option
+                            value="Deposit Approved"
+                            @selected(request('activity') === 'Deposit Approved')
+                        >
+                            Deposit Approved
+                        </option>
+
+                        <option
+                            value="Settings Changed"
+                            @selected(request('activity') === 'Settings Changed')
+                        >
+                            Settings Changed
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <input
+                        type="date"
+                        name="date"
+                        value="{{ request('date') }}"
+                        class="form-control"
+                    >
+
+                </div>
+
+                <div class="col-lg-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+                        Search
+                    </button>
+
+                </div>
 
             </div>
 
-            <div class="col-lg-3">
-
-                <select class="form-select">
-
-                    <option selected>
-                        All Activities
-                    </option>
-
-                    <option>
-                        Login
-                    </option>
-
-                    <option>
-                        Logout
-                    </option>
-
-                    <option>
-                        User Updated
-                    </option>
-
-                    <option>
-                        Wallet Credited
-                    </option>
-
-                    <option>
-                        Withdrawal Approved
-                    </option>
-
-                    <option>
-                        Deposit Approved
-                    </option>
-
-                    <option>
-                        Settings Changed
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="col-lg-3">
-
-                <input
-                    type="date"
-                    class="form-control">
-
-            </div>
-
-            <div class="col-lg-2">
-
-                <button class="btn btn-primary w-100">
-                    Search
-                </button>
-
-            </div>
-
-        </div>
+        </form>
 
     </div>
 
@@ -224,187 +261,73 @@
 
                 <tbody>
 
-                    <tr>
+                    @forelse($logs as $log)
 
-                        <td>1</td>
+                        <tr>
 
-                        <td>Super Admin</td>
+                            <td>
+                                {{ $logs->firstItem() + $loop->index }}
+                            </td>
 
-                        <td>
-                            <span class="badge bg-primary">
-                                Login
-                            </span>
-                        </td>
+                            <td>
+                                {{ $log->admin?->name ?? 'System' }}
+                            </td>
 
-                        <td>
-                            Administrator logged into dashboard
-                        </td>
+                            <td>
 
-                        <td>
-                            192.168.1.1
-                        </td>
+                                @php
+                                    $badge = match($log->activity) {
+                                        'Login' => 'primary',
+                                        'Logout' => 'secondary',
+                                        'User Updated' => 'warning',
+                                        'Wallet Credited' => 'success',
+                                        'Withdrawal Approved' => 'info',
+                                        'Deposit Approved' => 'dark',
+                                        'Settings Changed' => 'danger',
+                                        default => 'primary',
+                                    };
+                                @endphp
 
-                        <td>
-                            05 Jul 2026 09:10 AM
-                        </td>
+                                <span class="badge bg-{{ $badge }} 
+                                    @if($badge === 'warning') text-dark @endif">
 
-                    </tr>
+                                    {{ $log->activity }}
 
-                    <tr>
+                                </span>
 
-                        <td>2</td>
+                            </td>
 
-                        <td>Super Admin</td>
+                            <td>
+                                {{ $log->description ?? 'No description' }}
+                            </td>
 
-                        <td>
-                            <span class="badge bg-secondary">
-                                Logout
-                            </span>
-                        </td>
+                            <td>
+                                {{ $log->ip_address ?? 'N/A' }}
+                            </td>
 
-                        <td>
-                            Administrator logged out
-                        </td>
+                            <td>
+                                {{ $log->created_at->format('d M Y h:i A') }}
+                            </td>
 
-                        <td>
-                            192.168.1.1
-                        </td>
+                        </tr>
 
-                        <td>
-                            05 Jul 2026 10:20 AM
-                        </td>
+                    @empty
 
-                    </tr>
+                        <tr>
 
-                    <tr>
+                            <td colspan="6" class="text-center py-4">
 
-                        <td>3</td>
+                                <i class="bi bi-inbox fs-2 text-muted"></i>
 
-                        <td>Manager</td>
+                                <p class="text-muted mb-0">
+                                    No audit logs found.
+                                </p>
 
-                        <td>
-                            <span class="badge bg-warning text-dark">
-                                User Updated
-                            </span>
-                        </td>
+                            </td>
 
-                        <td>
-                            Updated John David's profile
-                        </td>
+                        </tr>
 
-                        <td>
-                            192.168.1.15
-                        </td>
-
-                        <td>
-                            05 Jul 2026 11:15 AM
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>4</td>
-
-                        <td>Finance Admin</td>
-
-                        <td>
-                            <span class="badge bg-success">
-                                Wallet Credited
-                            </span>
-                        </td>
-
-                        <td>
-                            Credited ₦10,000 to Mary Johnson
-                        </td>
-
-                        <td>
-                            192.168.1.18
-                        </td>
-
-                        <td>
-                            05 Jul 2026 11:40 AM
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>5</td>
-
-                        <td>Finance Admin</td>
-
-                        <td>
-                            <span class="badge bg-info">
-                                Withdrawal Approved
-                            </span>
-                        </td>
-
-                        <td>
-                            Approved ₦25,000 withdrawal
-                        </td>
-
-                        <td>
-                            192.168.1.18
-                        </td>
-
-                        <td>
-                            05 Jul 2026 12:05 PM
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>6</td>
-
-                        <td>Finance Admin</td>
-
-                        <td>
-                            <span class="badge bg-dark">
-                                Deposit Approved
-                            </span>
-                        </td>
-
-                        <td>
-                            Approved ₦50,000 deposit
-                        </td>
-
-                        <td>
-                            192.168.1.18
-                        </td>
-
-                        <td>
-                            05 Jul 2026 12:20 PM
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>7</td>
-
-                        <td>Super Admin</td>
-
-                        <td>
-                            <span class="badge bg-danger">
-                                Settings Changed
-                            </span>
-                        </td>
-
-                        <td>
-                            Updated platform transaction charges
-                        </td>
-
-                        <td>
-                            192.168.1.1
-                        </td>
-
-                        <td>
-                            05 Jul 2026 01:00 PM
-                        </td>
-
-                    </tr>
+                    @endforelse
 
                 </tbody>
 
@@ -412,48 +335,12 @@
 
         </div>
 
+        <!-- Pagination -->
         <div class="d-flex justify-content-end mt-3">
 
-            <nav>
-
-                <ul class="pagination mb-0">
-
-                    <li class="page-item disabled">
-                        <a class="page-link">
-                            Previous
-                        </a>
-                    </li>
-
-                    <li class="page-item active">
-                        <a class="page-link">
-                            1
-                        </a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link">
-                            2
-                        </a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link">
-                            3
-                        </a>
-                    </li>
-
-                    <li class="page-item">
-                        <a class="page-link">
-                            Next
-                        </a>
-                    </li>
-
-                </ul>
-
-            </nav>
+            {{ $logs->links() }}
 
         </div>
-
     </div>
 
 </div>
