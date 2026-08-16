@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Notification;
 use App\Exports\TransactionsExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -41,6 +42,63 @@ class AdminController extends Controller
     {
         return view('admin.user-create');
     }
+
+    public function updateProfile(Request $request)
+    {
+        $admin = Auth::guard('admin')->user();
+    
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:admins,email,' . $admin->id,
+            'phone' => 'nullable|string|max:20',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+    
+        // Update basic information
+        $admin->name = $validated['name'];
+        $admin->email = $validated['email'];
+        $admin->phone = $validated['phone'] ?? null;
+    
+        // Handle profile photo
+        if ($request->hasFile('profile_photo')) {
+    
+            // Delete old photo if it exists
+            if ($admin->profile_photo && Storage::disk('public')->exists($admin->profile_photo)) {
+                Storage::disk('public')->delete($admin->profile_photo);
+            }
+    
+            // Store new photo
+            $admin->profile_photo = $request->file('profile_photo')
+                ->store('admin/profile_photos', 'public');
+        }
+    
+        $admin->save();
+    
+        return redirect()
+            ->route('admin.profile')
+            ->with('success', 'Profile updated successfully.');
+    }public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $admin = Auth::guard('admin')->user();
+
+    // Check current password
+    if (!Hash::check($request->current_password, $admin->password)) {
+        return back()
+            ->withErrors(['current_password' => 'Your current password is incorrect.'])
+            ->withInput();
+    }
+
+    // Update password
+    $admin->password = Hash::make($request->password);
+    $admin->save();
+
+    return back()->with('success', 'Password changed successfully.');
+}
         public function readAll()
     {
         return view('admin.notification.read-all');

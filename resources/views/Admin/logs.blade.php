@@ -11,7 +11,7 @@
     <div>
         <h3 class="fw-bold mb-1">Audit Logs</h3>
         <p class="text-muted mb-0">
-            Track every administrative action performed on the BillVexa platform.
+            Track every administrative action performed on the {{ $setting->site_name ?? 'BillVexa' }} platform.
         </p>
     </div>
 

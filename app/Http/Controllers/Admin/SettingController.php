@@ -12,13 +12,9 @@ class SettingController extends Controller
 {
     public function index()
     {
-        $setting = Setting::first();
-
-        if (!$setting) {
-            $setting = Setting::create([]);
-        }
-
-        return view('admin.settings', compact('setting'));
+        $settings = Setting::first();
+    
+        return view('Admin.settings', compact('settings'));
     }
 
     public function update(Request $request)

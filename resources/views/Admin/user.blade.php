@@ -16,7 +16,7 @@
         </h3>
 
         <p class="text-muted mb-0">
-            Manage every registered user on BillVexa.
+            Manage every registered user on {{ $setting->site_name ?? 'BillVexa' }}.
         </p>
     </div>
 
@@ -208,20 +208,43 @@
 
                         <td>
 
-                            <img
-                            src="{{ $user->profile_photo ? asset('storage/'.$user->profile_photo) : 'https://i.pravatar.cc/40?u='.$user->id }}"
-                            width="40"
-                            height="40"
-                            class="rounded-circle me-2">
+                            @php
+                                $nameParts = preg_split('/\s+/', trim($user->name));
+                                $initials = '';
+
+                                foreach (array_slice($nameParts, 0, 2) as $part) {
+                                    $initials .= strtoupper(substr($part, 0, 1));
+                                }
+                            @endphp
+
+                            @if($user->profile_photo)
+
+                                <img
+                                    src="{{ asset('storage/' . $user->profile_photo) }}"
+                                    alt="{{ $user->name }}"
+                                    width="40"
+                                    height="40"
+                                    class="rounded-circle me-2"
+                                    style="object-fit: cover;"
+                                >
+
+                            @else
+
+                                <span
+                                    class="rounded-circle bg-primary text-white fw-bold d-inline-flex align-items-center justify-content-center me-2"
+                                    style="width:40px; height:40px; font-size:14px;"
+                                >
+                                    {{ $initials }}
+                                </span>
+
+                            @endif
 
                             <strong>{{ $user->name }}</strong>
 
                             <br>
 
                             <small class="text-muted">
-
                                 {{ $user->email }}
-
                             </small>
 
                         </td>

@@ -375,15 +375,36 @@
 
             <div class="d-flex align-items-center gap-3">
 
+                @php
+                    $nameParts = preg_split('/\s+/', trim(auth()->user()->name));
+                    $initials = '';
 
-                <img src="{{ auth()->user()->profile_photo
-                ? asset('storage/'.auth()->user()->profile_photo)
-                : 'https://i.pravatar.cc/45' }}"
+                    foreach (array_slice($nameParts, 0, 2) as $part) {
+                        $initials .= strtoupper(substr($part, 0, 1));
+                    }
+                @endphp
 
-                    class="rounded-circle"
-                    width="45"
-                    height="45">
+                @if(auth()->user()->profile_photo)
 
+                    <img
+                        src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                        alt="{{ auth()->user()->name }}"
+                        class="rounded-circle border border-2 border-primary"
+                        width="45"
+                        height="45"
+                        style="object-fit:cover;"
+                    >
+
+                @else
+
+                    <div
+                        class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center"
+                        style="width:45px; height:45px;"
+                    >
+                        {{ $initials }}
+                    </div>
+
+                @endif
             </div>
 
         </div>
@@ -398,33 +419,61 @@
                     <!-- PROFILE -->
                     <div class="text-center mb-4">
 
-                    <img
-                    id="previewImage"
-                    src="{{ auth()->user()->profile_photo
-                        ? asset('storage/' . auth()->user()->profile_photo)
-                        : 'https://i.pravatar.cc/150' }}"
-                    class="rounded-circle border border-4 border-primary"
-                    width="120"
-                    height="120"
-                    alt="Profile">
+                        @php
+                            $nameParts = preg_split('/\s+/', trim(auth()->user()->name));
+                            $initials = '';
+
+                            foreach (array_slice($nameParts, 0, 2) as $part) {
+                                $initials .= strtoupper(substr($part, 0, 1));
+                            }
+                        @endphp
+
+                        @if(auth()->user()->profile_photo)
+
+                            <img
+                                id="previewImage"
+                                src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                                alt="{{ auth()->user()->name }}"
+                                class="rounded-circle border border-4 border-primary mb-0"
+                                width="120"
+                                height="120"
+                                style="object-fit: cover;"
+                            >
+
+                        @else
+
+                            <div
+                                id="previewImage"
+                                class="rounded-circle border border-4 border-primary bg-primary text-white fw-bold d-inline-flex align-items-center justify-content-center mb-0"
+                                style="
+                                    width:120px;
+                                    height:120px;
+                                    font-size:40px;
+                                    line-height:1;
+                                "
+                            >
+                                {{ $initials }}
+                            </div>
+
+                        @endif
 
                         <h4 class="fw-bold mt-3 mb-1">
-                        {{ Auth::user()->name }}
+                            {{ auth()->user()->name }}
                         </h4>
 
                         <small class="text-muted d-block mb-3">
-                         {{ Auth::user()->email }}
+                            {{ auth()->user()->email }}
                         </small>
 
-                        <label for="profile_photo" class="btn btn-primary rounded-pill px-4">
-                        <i class="fas fa-camera me-2"></i>
-                        Change Photo
+                        <label
+                            for="profile_photo"
+                            class="btn btn-primary rounded-pill px-4"
+                        >
+                            <i class="fas fa-camera me-2"></i>
+                            Change Photo
                         </label>
 
-
-
                     </div>
-
                     <hr>
 
                     <!-- STATS -->

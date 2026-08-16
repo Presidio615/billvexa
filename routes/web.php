@@ -395,6 +395,16 @@ Route::get('/notifications/read/{notification}', [NotificationController::class,
     
         Route::post('/login', [AdminAuthController::class, 'login'])
             ->name('login.submit');
+
+            Route::get('/2fa', [
+                \App\Http\Controllers\Admin\AdminAuthController::class,
+                'showTwoFactor'
+            ])->name('2fa');
+    
+            Route::post('/2fa', [
+                \App\Http\Controllers\Admin\AdminAuthController::class,
+                'verifyTwoFactor'
+            ])->name('2fa.verify');
         
        
     
@@ -424,12 +434,20 @@ Route::get('/notifications/read/{notification}', [NotificationController::class,
     
             Route::put('/password', [AdminController::class, 'updatePassword'])
                 ->name('password.update');
+
+                Route::put('/profile', [AdminController::class, 'updateProfile'])
+    ->name('profile.update');
     
                 Route::get('/settings', [SettingController::class,'index'])
                 ->name('setting');
             
             Route::post('/settings', [SettingController::class,'update'])
                 ->name('settings.update');
+
+                Route::post('/settings/security', [
+                \App\Http\Controllers\Admin\SettingController::class,
+                'updateSecurity'
+            ])->name('settings.security');
     
             Route::get('/users', [AdminController::class, 'users'])
                 ->name('user');

@@ -6,7 +6,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>BillVexa | Two-Factor Authentication</title>
+    <title>{{ $setting->site_name ?? 'BillVexa' }} | Two-Factor Authentication</title>
 
     <!-- Bootstrap -->
     @vite(['resources/css/app.css','resources/js/app.js'])

@@ -484,13 +484,37 @@
                     
                     @endif
                </a>
+               @php
+                    $nameParts = preg_split('/\s+/', trim(auth()->user()->name));
+                    $initials = '';
 
-                <img src="{{ auth()->user()->profile_photo
-                ? asset('storage/' . auth()->user()->profile_photo)
-                : 'https://i.pravatar.cc/150' }}"
-                class="rounded-circle"
-                width="45"
-                height="45">
+                    foreach (array_slice($nameParts, 0, 2) as $part) {
+                        $initials .= strtoupper(substr($part, 0, 1));
+                    }
+                @endphp
+
+                @if(auth()->user()->profile_photo)
+
+                    <img
+                        src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                        alt="{{ auth()->user()->name }}"
+                        class="rounded-circle border border-2 border-primary"
+                        width="45"
+                        height="45"
+                        style="object-fit:cover;"
+                    >
+
+                @else
+
+                    <div
+                        class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center"
+                        style="width:45px; height:45px;"
+                    >
+                        {{ $initials }}
+                    </div>
+
+                @endif
+                
 
             </div>
 

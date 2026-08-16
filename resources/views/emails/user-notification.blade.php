@@ -19,7 +19,7 @@
             <div style="background:#0d6efd; padding:25px; text-align:center;">
 
                 <h2 style="margin:0; color:#ffffff;">
-                    BillVexa
+                    {{ $setting->site_name ?? 'BillVexa' }}
                 </h2>
 
             </div>
@@ -40,7 +40,7 @@
 
                 <p style="font-size:13px; color:#999; margin-bottom:0;">
 
-                    This is an automated notification from BillVexa.
+                    This is an automated notification from {{ $setting->site_name ?? 'BillVexa' }}.
 
                 </p>
 

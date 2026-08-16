@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class Admin extends Authenticatable
 {
-    use Notifiable;
-
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'profile_photo',
         'password',
-
+        'failed_attempts',
+        'locked_until',
+        'two_factor_code',
+        'two_factor_expires_at',
     ];
 
     protected $hidden = [
@@ -22,6 +24,7 @@ class Admin extends Authenticatable
     ];
 
     protected $casts = [
-        'password' => 'hashed',
+        'locked_until' => 'datetime',
+        'two_factor_expires_at' => 'datetime',
     ];
 }

@@ -60,7 +60,7 @@
         <div>
             <h3 class="fw-bold mb-1">Service Management</h3>
             <p class="text-muted mb-0">
-                Manage all services offered on BillVexa.
+                Manage all services offered on {{ $setting->site_name ?? 'BillVexa' }}.
             </p>
         </div>
 

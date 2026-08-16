@@ -2,11 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>BillVexa Verification Code</title>
+    <title>{{ $setting->site_name ?? 'BillVexa' }} Verification Code</title>
 </head>
 <body style="font-family: Arial, sans-serif;">
 
-    <h2>BillVexa Two-Factor Authentication</h2>
+    <h2>{{ $setting->site_name ?? 'BillVexa' }} Two-Factor Authentication</h2>
 
     <p>Hello,</p>
 

@@ -57,7 +57,7 @@
         <div>
             <h3 class="fw-bold mb-1">System Settings</h3>
             <p class="text-muted mb-0">
-                Configure the entire BillVexa platform.
+                Configure the entire {{ $setting->site_name ?? 'BillVexa' }} platform.
             </p>
         </div>
 
@@ -171,47 +171,101 @@
 
                 <div class="card-body">
 
+                <form method="POST" action="{{ route('admin.settings.security') }}">
+                    @csrf
+
+                    {{-- Two-Factor Authentication --}}
                     <div class="form-check form-switch mb-4">
-                        <input class="form-check-input"
-                        type="checkbox"
-                        name="two_factor"
-                        {{ $setting->two_factor ? 'checked' : '' }}>
-                        <label class="form-check-label">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="two_factor"
+                            value="1"
+                            id="twoFactor"
+                            {{ $settings->two_factor ? 'checked' : '' }}
+                        >
+
+                        <label class="form-check-label" for="twoFactor">
                             Two-Factor Authentication
                         </label>
                     </div>
 
-                    <div class="form-check form-switch mb-4">
+
+                    {{-- Maintenance Mode --}}
+                    <div class="form-check mb-4">
                         <input
-                        type="checkbox"
-                        name="maintenance_mode"
-                        {{ $setting->maintenance_mode ? 'checked' : '' }}>
-                        <label class="form-check-label">
+                            class="form-check-input"
+                            type="checkbox"
+                            name="maintenance_mode"
+                            value="1"
+                            id="maintenanceMode"
+                            {{ $settings->maintenance_mode ? 'checked' : '' }}
+                        >
+
+                        <label class="form-check-label" for="maintenanceMode">
                             Maintenance Mode
                         </label>
                     </div>
 
+
+                    {{-- Login Attempts --}}
                     <div class="mb-3">
                         <label class="form-label">
                             Login Attempts
                         </label>
+
                         <input
-                        type="number"
-                        name="login_attempts"
-                        class="form-control"
-                        value="{{ old('login_attempts', $setting->login_attempts) }}">
+                            type="number"
+                            name="login_attempts"
+                            class="form-control"
+                            min="1"
+                            max="20"
+                            value="{{ $settings->login_attempts }}"
+                            required
+                        >
                     </div>
 
-                    <div>
+
+                    {{-- Lockout Duration --}}
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Lockout Duration (Minutes)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="lockout_duration"
+                            class="form-control"
+                            min="1"
+                            max="1440"
+                            value="{{ $settings->lockout_duration }}"
+                            required
+                        >
+                    </div>
+
+
+                    {{-- Session Timeout --}}
+                    <div class="mb-3">
                         <label class="form-label">
                             Session Timeout (Minutes)
                         </label>
+
                         <input
-                        type="number"
-                        name="session_timeout"
-                        class="form-control"
-                        value="{{ old('session_timeout', $setting->session_timeout) }}">
+                            type="number"
+                            name="session_timeout"
+                            class="form-control"
+                            min="1"
+                            max="1440"
+                            value="{{ $settings->session_timeout }}"
+                            required
+                        >
                     </div>
+
+
+                    <button type="submit" class="btn btn-primary">
+                        Save Security Settings
+                    </button>
+                </form>
 
                 </div>
 

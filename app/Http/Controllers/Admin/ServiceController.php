@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\AuditLog;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Services\VTpassService;
 use Illuminate\Http\Request;
 
@@ -379,4 +380,33 @@ class ServiceController extends Controller
             'Unable to connect to API.'
         );
     }
+
+    public function updateSecurity(Request $request)
+{
+    $validated = $request->validate([
+        'two_factor' => ['nullable', 'boolean'],
+        'maintenance_mode' => ['nullable', 'boolean'],
+        'login_attempts' => ['required', 'integer', 'min:1', 'max:20'],
+        'lockout_duration' => ['required', 'integer', 'min:1', 'max:1440'],
+        'session_timeout' => ['required', 'integer', 'min:1', 'max:1440'],
+    ]);
+
+    $settings = Setting::first();
+
+    if (!$settings) {
+        return back()->withErrors([
+            'settings' => 'System settings record was not found.',
+        ]);
+    }
+
+    $settings->update([
+        'two_factor' => $request->boolean('two_factor'),
+        'maintenance_mode' => $request->boolean('maintenance_mode'),
+        'login_attempts' => $validated['login_attempts'],
+        'lockout_duration' => $validated['lockout_duration'],
+        'session_timeout' => $validated['session_timeout'],
+    ]);
+
+    return back()->with('success', 'Security settings updated successfully.');
+}
 }
