@@ -12,74 +12,165 @@
 
 <div class="container">
 
-<div class="row justify-content-center mt-5">
+    <div class="row justify-content-center mt-5">
 
-<div class="col-md-4">
+        <div class="col-md-4">
 
-<div class="card shadow">
+            <div class="card shadow">
 
-<div class="card-header text-center">
+                <div class="card-header text-center">
+                    <h4>Admin Login</h4>
+                </div>
 
-<h4>Admin Login</h4>
+                <div class="card-body">
+
+                    {{-- Success Message --}}
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert">
+                            </button>
+                        </div>
+                    @endif
+
+                    {{-- Error Messages --}}
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+                            @foreach($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert">
+                            </button>
+
+                        </div>
+                    @endif
+
+                    <form action="{{ route('admin.login.submit') }}" method="POST">
+
+                        @csrf
+
+                        <div class="mb-3">
+
+                            <label for="email" class="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control @error('email') is-invalid @enderror"
+                                value="{{ old('email') }}"
+                                required
+                                autofocus
+                            >
+
+                            @error('email')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label for="password" class="form-label">
+                                Password
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-control @error('password') is-invalid @enderror"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="togglePassword"
+                                >
+                                    Show
+                                </button>
+
+                            </div>
+
+                            @error('password')
+                                <div class="text-danger small mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
+                        </div>
+
+                        <div class="mb-3 form-check">
+
+                            <input
+                                type="checkbox"
+                                name="remember"
+                                id="remember"
+                                class="form-check-input"
+                            >
+
+                            <label for="remember" class="form-check-label">
+                                Remember Me
+                            </label>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+                            Login
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="card-body">
+<script>
 
-<form action="{{ route('admin.login') }}" method="POST">
+document.getElementById('togglePassword').addEventListener('click', function () {
 
-@csrf
+    const password = document.getElementById('password');
 
-<div class="mb-3">
+    if (password.type === 'password') {
 
-<label>Email</label>
+        password.type = 'text';
+        this.textContent = 'Hide';
 
-<input
-type="email"
-name="email"
-class="form-control"
-required>
+    } else {
 
-</div>
+        password.type = 'password';
+        this.textContent = 'Show';
 
-<div class="mb-3">
+    }
 
-<label>Password</label>
+});
 
-<input
-type="password"
-name="password"
-class="form-control"
-required>
+</script>
 
-</div>
-
-<div class="mb-3">
-
-<input type="checkbox" name="remember">
-
-Remember Me
-
-</div>
-
-<button class="btn btn-primary w-100">
-
-Login
-
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

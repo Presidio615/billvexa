@@ -243,25 +243,6 @@
                         >
                     </div>
 
-
-                    {{-- Session Timeout --}}
-                    <div class="mb-3">
-                        <label class="form-label">
-                            Session Timeout (Minutes)
-                        </label>
-
-                        <input
-                            type="number"
-                            name="session_timeout"
-                            class="form-control"
-                            min="1"
-                            max="1440"
-                            value="{{ $settings->session_timeout }}"
-                            required
-                        >
-                    </div>
-
-
                     <button type="submit" class="btn btn-primary">
                         Save Security Settings
                     </button>

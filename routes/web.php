@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FlutterwaveVirtualAccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\FlutterwaveController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WalletController;
@@ -304,6 +306,8 @@ Route::middleware('auth')->group(function () {
         return view('BillVexa.Dashboard.Quick.Electricity');
     })->name('electricity');
 
+    
+
     /*
     |--------------------------------------------------------------------------
     | Admin Bank Accounts
@@ -356,7 +360,28 @@ Route::middleware('auth')->group(function () {
 
     });
 
+    Route::post(
+        '/wallet/fund/flutterwave',
+        [FlutterwaveController::class, 'initialize']
+    )->name('flutterwave.initialize');
+
+    Route::post(
+    '/flutterwave/webhook',
+    [FlutterwaveController::class, 'webhook']
+)->name('flutterwave.webhook');
+
+Route::post(
+    '/wallet/create-virtual-account',
+    [FlutterwaveVirtualAccountController::class, 'create']
+)->name('wallet.create.virtual.account');
+
+
 });
+
+Route::get(
+    '/payment/flutterwave/callback',
+    [FlutterwaveController::class, 'callback']
+)->name('flutterwave.callback');
 
 /*
 |--------------------------------------------------------------------------

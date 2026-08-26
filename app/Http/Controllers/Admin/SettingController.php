@@ -36,8 +36,6 @@ class SettingController extends Controller
 
         'login_attempts'=>'required|integer|min:1',
 
-        'session_timeout'=>'required|integer|min:5',
-
         'minimum_deposit'=>'required|numeric',
 
         'minimum_withdrawal'=>'required|numeric',

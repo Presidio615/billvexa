@@ -70,6 +70,8 @@ class AdminAuthController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        
+
         if (
             !Auth::guard('admin')->attempt(
                 $credentials,

@@ -66,4 +66,16 @@ return [
 ],
 
 
+'paystack' => [
+    'secret' => env('PAYSTACK_SECRET_KEY'),
+    'public' => env('PAYSTACK_PUBLIC_KEY'),
+],
+
+'flutterwave' => [
+    'public' => env('FLW_PUBLIC_KEY'),
+    'secret' => env('FLW_SECRET_KEY'),
+    'encryption_key' => env('FLW_ENCRYPTION_KEY'),
+],
+
+
 ];

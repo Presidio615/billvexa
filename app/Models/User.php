@@ -34,6 +34,17 @@ class User extends Authenticatable
         'account_number',
         'account_bank',
         'account_reference',
+
+        'paystack_customer_code',
+        'paystack_dva_id',
+        'paystack_account_number',
+        'paystack_account_name',
+        'paystack_bank_name',
+
+        'flutterwave_customer_id',
+        'flutterwave_account_reference',
+        'flutterwave_account_id',
+
         'referral_code',
         'referred_by',
         'google_id',
@@ -113,6 +124,11 @@ public function notifications()
 public function deposits()
 {
     return $this->hasMany(Deposit::class);
+}
+
+public function payments()
+{
+    return $this->hasMany(Payment::class);
 }
     
 }

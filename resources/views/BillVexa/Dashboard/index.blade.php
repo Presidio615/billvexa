@@ -839,39 +839,64 @@
 
                 <div class="modal-body">
 
+   
+
                     <div class="account-box">
 
                         <div class="mb-3">
                             <small class="text-muted">Bank Name</small>
 
                             <h5 class="fw-bold text-primary">
-                                {{ auth()->user()->account_bank ?? 'Not Assigned' }}
+                             {{ auth()->user()->account_bank ?? 'Not Assigned' }}
                             </h5>
                         </div>
 
                         <hr>
 
                         <div class="mb-3">
-                            <small class="text-muted">
+                            <small class="text-muted d-block mb-2">
                                 Account Number
                             </small>
 
-                            <div class="d-flex justify-content-between align-items-center">
+                            @if(auth()->user()->account_number)
 
-                                <h4 id="accountNumber" class="fw-bold mb-0">
-                                    {{ auth()->user()->account_number ?? 'Not Assigned' }}
-                                </h4>
+                                <div class="d-flex align-items-center justify-content-between
+                                            bg-white border rounded-3 p-3">
 
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-primary btn-sm"
-                                    onclick="copyAccount()">
+                                    <div>
+                                        <div
+                                            id="accountNumber"
+                                            class="fw-bold text-dark"
+                                            style="font-size: 20px; letter-spacing: 1px;"
+                                        >
+                                            {{ auth()->user()->account_number }}
+                                        </div>
 
-                                    <i class="bi bi-copy"></i>
+                                        <small class="text-muted">
+                                            Use this account number to fund your wallet
+                                        </small>
+                                    </div>
 
-                                </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary btn-sm"
+                                        onclick="copyAccount()"
+                                        title="Copy account number"
+                                    >
+                                        <i class="bi bi-copy"></i>
+                                        Copy
+                                    </button>
 
-                            </div>
+                                </div>
+
+                            @else
+
+                                <div class="alert alert-warning mb-0">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Your virtual account has not been assigned yet.
+                                </div>
+
+                            @endif
                         </div>
 
                         <hr>
@@ -945,15 +970,19 @@
         updateGreeting();
 
         // TO COPY ACCOUNT NUMBER
-        function copyAccount(){
+        function copyAccount() {
+            const account = document
+                .getElementById('accountNumber')
+                .innerText
+                .trim();
 
-            const account =
-            document.getElementById("accountNumber").innerText;
-
-            navigator.clipboard.writeText(account);
-
-            alert("Account Number Copied Successfully!");
-
+            navigator.clipboard.writeText(account)
+                .then(() => {
+                    alert('Account Number Copied Successfully!');
+                })
+                .catch(() => {
+                    alert('Unable to copy account number.');
+                });
         }
 
         // ===============================

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\FlutterwaveService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -54,6 +55,10 @@ class AuthController extends Controller
             'referred_by' => $referrer?->id,
 
         ]);
+
+        $flutterwave = app(FlutterwaveService::class);
+
+        $accountResult = $flutterwave->createStaticVirtualAccount($user);
 
         // Give referral bonus
         if ($referrer) {
