@@ -42,7 +42,7 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| BillHub Public Pages
+| BillVexa Public Pages
 |--------------------------------------------------------------------------
 */
 
@@ -73,6 +73,7 @@ Route::get('/terms', function () {
 Route::get('/refund', function () {
     return view('BillVexa.Footer.Refund-Policy');
 })->name('refund');
+
 
 
 /*
@@ -306,7 +307,29 @@ Route::middleware('auth')->group(function () {
         return view('BillVexa.Dashboard.Quick.Electricity');
     })->name('electricity');
 
-    
+    Route::get('/quick/education', function () {
+        return view('BillVexa.Dashboard.Quick.education');
+    })->name('education');
+
+    Route::get('/quick/transport', function () {
+        return view('BillVexa.Dashboard.Quick.transport');
+    })->name('transport');
+
+    Route::get('/quick/sports', function () {
+        return view('BillVexa.Dashboard.Quick.sport');
+    })->name('sports');
+
+    Route::get('/quick/flight', function () {
+        return view('BillVexa.Dashboard.Quick.flight');
+    })->name('flight');
+
+    Route::get('/quick/hotel', function () {
+        return view('BillVexa.Dashboard.Quick.hotel');
+    })->name('hotel');
+
+    Route::get('/quick/gift-card', function () {
+        return view('BillVexa.Dashboard.Quick.gift-card');
+    })->name('gift-card');
 
     /*
     |--------------------------------------------------------------------------

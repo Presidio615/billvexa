@@ -847,7 +847,7 @@
                             <small class="text-muted">Bank Name</small>
 
                             <h5 class="fw-bold text-primary">
-                             {{ auth()->user()->account_bank ?? 'Not Assigned' }}
+                            {{ auth()->user()->account_bank ?? 'Not Assigned' }}
                             </h5>
                         </div>
 

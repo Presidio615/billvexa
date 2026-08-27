@@ -384,7 +384,7 @@
 
                 <!-- Education -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="" class="service-item text-center">
+                    <a href="{{ route('education') }}" class="service-item text-center">
                         <div class="icon-box dark">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
@@ -394,7 +394,7 @@
 
                 <!-- Transport -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="./Quick service/transport.php" class="service-item text-center">
+                    <a href="{{ route('transport') }}" class="service-item text-center">
                         <div class="icon-box purple">
                             <i class="bi bi-bus-front-fill"></i>
                         </div>
@@ -404,7 +404,7 @@
 
                 <!-- Sport -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="./Quick service/sport.php" class="service-item text-center">
+                    <a href="{{ route('sports') }}" class="service-item text-center">
                         <div class="icon-box green">
                             <i class="fa-solid fa-futbol"></i>
                         </div>
@@ -414,7 +414,7 @@
 
                 <!-- Flight -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="./Quick service/flight.php" class="service-item text-center">
+                    <a href="{{ route('flight') }}" class="service-item text-center">
                         <div class="icon-box orange">
                             <i class="bi bi-airplane-fill"></i>
                         </div>
@@ -424,7 +424,7 @@
 
                 <!-- Hotel -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="./Quick service/hotel.php" class="service-item text-center">
+                    <a href="{{ route('hotel') }}" class="service-item text-center">
                         <div class="icon-box blue">
                             <i class="fa-solid fa-hotel"></i>
                         </div>
@@ -434,7 +434,7 @@
 
                 <!-- Gift Card -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="./Quick service/gift-card.php" class="service-item text-center">
+                    <a href="{{ route('gift-card') }}" class="service-item text-center">
                         <div class="icon-box red">
                             <i class="bi bi-credit-card-fill"></i>
                         </div>
@@ -444,7 +444,7 @@
 
                 <!-- Ticket -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="./Quick service/ticket.php" class="service-item text-center">
+                    <a href="" class="service-item text-center">
                         <div class="icon-box dark">
                             <i class="bi bi-ticket-fill"></i>
                         </div>
