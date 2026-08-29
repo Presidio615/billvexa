@@ -62,10 +62,10 @@
             top: 0;
             left: 0;
 
-            background: linear-gradient(
+            background:linear-gradient(
                 180deg,
-                blueviolet,
-                #4b49f5
+                #5b21b6,
+                #2563eb
             );
 
             padding: 25px 15px;

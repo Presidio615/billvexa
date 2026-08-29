@@ -151,13 +151,12 @@
            HERO
         ======================================== */
 
-        .fight-hero {
-            background:
-                linear-gradient(
-                    135deg,
-                    blueviolet,
-                    #4b49f5
-                );
+        .flight-hero {
+            background:linear-gradient(
+                180deg,
+                #5b21b6,
+                #2563eb
+            );
 
             border-radius: 22px;
 
@@ -172,7 +171,7 @@
             margin-bottom: 25px;
         }
 
-        .fight-hero::before {
+        .flight-hero::before {
             content: "";
 
             position: absolute;
@@ -189,7 +188,7 @@
             top: -100px;
         }
 
-        .fight-hero::after {
+        .flight-hero::after {
             content: "";
 
             position: absolute;
@@ -227,10 +226,10 @@
 
 
         /* ========================================
-           FIGHT TYPES
+           FLIGHT TYPES
         ======================================== */
 
-        .fight-type {
+        .flight-type {
             background: white;
 
             border: 1px solid #e6e6e6;
@@ -252,8 +251,8 @@
             transition: .3s ease;
         }
 
-        .fight-type:hover,
-        .fight-type.active {
+        .flight-type:hover,
+        .flight-type.active {
             border-color: blueviolet;
 
             background: #f8f4ff;
@@ -263,13 +262,13 @@
             transform: translateY(-4px);
         }
 
-        .fight-type i {
+        .flight-type i {
             font-size: 28px;
 
             margin-bottom: 10px;
         }
 
-        .fight-type h6 {
+        .flight-type h6 {
             font-weight: 700;
 
             margin-bottom: 4px;
@@ -383,10 +382,10 @@
 
 
         /* ========================================
-           FIGHTER
+           FLIGHTER
         ======================================== */
 
-        .fighter {
+        .flighter {
             display: flex;
 
             align-items: center;
@@ -396,7 +395,7 @@
             padding: 13px 0;
         }
 
-        .fighter-info {
+        .flighter-info {
             display: flex;
 
             align-items: center;
@@ -404,7 +403,7 @@
             gap: 12px;
         }
 
-        .fighter-avatar {
+        .flighter-avatar {
             width: 45px;
             height: 45px;
 
@@ -422,11 +421,11 @@
             font-size: 18px;
         }
 
-        .fighter-name {
+        .flighter-name {
             font-weight: 700;
         }
 
-        .fighter-record {
+        .flighter-record {
             color: #888;
 
             font-size: 12px;
@@ -462,7 +461,7 @@
            BUTTON
         ======================================== */
 
-        .fight-btn {
+        .flight-btn {
             display: inline-block;
 
             text-decoration: none;
@@ -484,7 +483,7 @@
             transition: .3s ease;
         }
 
-        .fight-btn:hover {
+        .flight-btn:hover {
             background: blueviolet;
 
             color: white;
@@ -854,7 +853,7 @@
             </div>
 
             <h2 class="fw-bold">
-                Welcome to BillVexa Flight
+                Welcome to {{ $setting->site_name ?? 'BillVexa' }} Flight
             </h2>
 
             <p class="mb-0 opacity-75">
@@ -942,7 +941,7 @@
                         </h6>
 
                         <small class="text-muted">
-                            Fight Events
+                            Flight Events
                         </small>
 
                     </a>
@@ -1001,7 +1000,7 @@
                             type="text"
                             id="flightSearch"
                             class="form-control"
-                            placeholder="Search fighter, event or competition..."
+                            placeholder="Search flighter, event or competition..."
                         >
 
                     </div>
@@ -1135,11 +1134,11 @@
 
                                 <div class="event-body">
 
-                                    <div class="fighter">
+                                    <div class="flighter">
 
-                                        <div class="fighter-info">
+                                        <div class="flighter-info">
 
-                                            <div class="fighter-avatar">
+                                            <div class="flighter-avatar">
 
                                                 <i class="fa-solid fa-user"></i>
 
@@ -1147,13 +1146,13 @@
 
                                             <div>
 
-                                                <div class="fighter-name">
+                                                <div class="flighter-name">
 
-                                                    {{ $flight->fighter_one ?? 'Fighter One' }}
+                                                    {{ $flight->fighter_one ?? 'Flighter One' }}
 
                                                 </div>
 
-                                                <div class="fighter-record">
+                                                <div class="flighter-record">
 
                                                     {{ $flight->fighter_one_record ?? 'Record unavailable' }}
 
@@ -1179,11 +1178,11 @@
                                     </div>
 
 
-                                    <div class="fighter">
+                                    <div class="flighter">
 
-                                        <div class="fighter-info">
+                                        <div class="flighter-info">
 
-                                            <div class="fighter-avatar">
+                                            <div class="flighter-avatar">
 
                                                 <i class="fa-solid fa-user"></i>
 
@@ -1191,15 +1190,15 @@
 
                                             <div>
 
-                                                <div class="fighter-name">
+                                                <div class="flighter-name">
 
-                                                    {{ $flight->fighter_two ?? 'Fighter Two' }}
+                                                    {{ $flight->flighter_two ?? 'Flighter Two' }}
 
                                                 </div>
 
-                                                <div class="fighter-record">
+                                                <div class="flighter-record">
 
-                                                    {{ $flight->fighter_two_record ?? 'Record unavailable' }}
+                                                    {{ $flight->flighter_two_record ?? 'Record unavailable' }}
 
                                                 </div>
 
@@ -1208,7 +1207,7 @@
                                         </div>
 
                                         <strong>
-                                            {{ $flight->fighter_two_score ?? '-' }}
+                                            {{ $flight->flighter_two_score ?? '-' }}
                                         </strong>
 
                                     </div>
@@ -1306,11 +1305,11 @@
 
                             <div class="event-body">
 
-                                <div class="fighter">
+                                <div class="flighter">
 
-                                    <div class="fighter-info">
+                                    <div class="flighter-info">
 
-                                        <div class="fighter-avatar">
+                                        <div class="flighter-avatar">
 
                                             <i class="fa-solid fa-user"></i>
 
@@ -1318,11 +1317,11 @@
 
                                         <div>
 
-                                            <div class="fighter-name">
-                                                Fighter One
+                                            <div class="flighter-name">
+                                                Flighter One
                                             </div>
 
-                                            <div class="fighter-record">
+                                            <div class="flighter-record">
                                                 20 - 2 - 0
                                             </div>
 
@@ -1346,11 +1345,11 @@
                                 </div>
 
 
-                                <div class="fighter">
+                                <div class="flighter">
 
-                                    <div class="fighter-info">
+                                    <div class="flighter-info">
 
-                                        <div class="fighter-avatar">
+                                        <div class="flighter-avatar">
 
                                             <i class="fa-solid fa-user"></i>
 
@@ -1358,11 +1357,11 @@
 
                                         <div>
 
-                                            <div class="fighter-name">
-                                                Fighter Two
+                                            <div class="flighter-name">
+                                                Flighter Two
                                             </div>
 
-                                            <div class="fighter-record">
+                                            <div class="flighter-record">
                                                 18 - 3 - 1
                                             </div>
 
@@ -1404,7 +1403,7 @@
 
 
         <!-- ========================================
-             UPCOMING FIGHTS
+             UPCOMING FLIGHTS
         ======================================== -->
 
         <div class="row g-4">
@@ -1422,7 +1421,7 @@
 
                             <i class="bi bi-calendar-event me-2"></i>
 
-                            Upcoming Fights
+                            Upcoming Flights
 
                         </h5>
 
@@ -1484,11 +1483,11 @@
 
                                         <div class="col-md-7">
 
-                                            <div class="fighter">
+                                            <div class="flighter">
 
-                                                <div class="fighter-info">
+                                                <div class="flighter-info">
 
-                                                    <div class="fighter-avatar">
+                                                    <div class="flighter-avatar">
 
                                                         <i class="fa-solid fa-user"></i>
 
@@ -1496,15 +1495,15 @@
 
                                                     <div>
 
-                                                        <div class="fighter-name">
+                                                        <div class="flighter-name">
 
-                                                            {{ $flight->fighter_one ?? 'Fighter One' }}
+                                                            {{ $flight->fighter_one ?? 'Flighter One' }}
 
                                                         </div>
 
-                                                        <div class="fighter-record">
+                                                        <div class="flighter-record">
 
-                                                            {{ $flight->fighter_one_record ?? 'Record unavailable' }}
+                                                            {{ $flight->flighter_one_record ?? 'Record unavailable' }}
 
                                                         </div>
 
@@ -1523,11 +1522,11 @@
                                             </div>
 
 
-                                            <div class="fighter">
+                                            <div class="flighter">
 
-                                                <div class="fighter-info">
+                                                <div class="flighter-info">
 
-                                                    <div class="fighter-avatar">
+                                                    <div class="flighter-avatar">
 
                                                         <i class="fa-solid fa-user"></i>
 
@@ -1535,15 +1534,15 @@
 
                                                     <div>
 
-                                                        <div class="fighter-name">
+                                                        <div class="flighter-name">
 
-                                                            {{ $flight->fighter_two ?? 'Fighter Two' }}
+                                                            {{ $flight->flighter_two ?? 'Flighter Two' }}
 
                                                         </div>
 
-                                                        <div class="fighter-record">
+                                                        <div class="flighter-record">
 
-                                                            {{ $flight->fighter_two_record ?? 'Record unavailable' }}
+                                                            {{ $flight->flighter_two_record ?? 'Record unavailable' }}
 
                                                         </div>
 
@@ -1629,7 +1628,7 @@
                         <!-- DEMO UPCOMING -->
 
                         <div
-                            class="event-card mb-3 fight-item"
+                            class="event-card mb-3 flight-item"
                             data-type="boxing"
                         >
 
@@ -1668,11 +1667,11 @@
 
                                     <div class="col-md-7">
 
-                                        <div class="fighter">
+                                        <div class="flighter">
 
-                                            <div class="fighter-info">
+                                            <div class="flighter-info">
 
-                                                <div class="fighter-avatar">
+                                                <div class="flighter-avatar">
 
                                                     <i class="fa-solid fa-user"></i>
 
@@ -1680,11 +1679,11 @@
 
                                                 <div>
 
-                                                    <div class="fighter-name">
-                                                        Fighter Alpha
+                                                    <div class="flighter-name">
+                                                        Flighter Alpha
                                                     </div>
 
-                                                    <div class="fighter-record">
+                                                    <div class="flighter-record">
                                                         24 - 1 - 0
                                                     </div>
 
@@ -1704,11 +1703,11 @@
                                         </div>
 
 
-                                        <div class="fighter">
+                                        <div class="flighter">
 
-                                            <div class="fighter-info">
+                                            <div class="flighter-info">
 
-                                                <div class="fighter-avatar">
+                                                <div class="flighter-avatar">
 
                                                     <i class="fa-solid fa-user"></i>
 
@@ -1716,11 +1715,11 @@
 
                                                 <div>
 
-                                                    <div class="fighter-name">
-                                                        Fighter Beta
+                                                    <div class="flighter-name">
+                                                        Flighter Beta
                                                     </div>
 
-                                                    <div class="fighter-record">
+                                                    <div class="flighter-record">
                                                         21 - 3 - 0
                                                     </div>
 
@@ -1763,7 +1762,7 @@
                                             href="#"
                                             class="primary-btn"
                                         >
-                                            Fight Details
+                                            Flight Details
                                         </a>
 
                                     </div>
@@ -1776,7 +1775,7 @@
 
 
                         <div
-                            class="event-card mb-3 fight-item"
+                            class="event-card mb-3 flight-item"
                             data-type="mma"
                         >
 
@@ -1791,7 +1790,7 @@
                                         </small>
 
                                         <h5 class="mb-0 mt-1">
-                                            Fight Night
+                                            Flight Night
                                         </h5>
 
                                     </div>
@@ -1815,11 +1814,11 @@
 
                                     <div class="col-md-7">
 
-                                        <div class="fighter">
+                                        <div class="flighter">
 
-                                            <div class="fighter-info">
+                                            <div class="flighter-info">
 
-                                                <div class="fighter-avatar">
+                                                <div class="flighter-avatar">
 
                                                     <i class="fa-solid fa-user"></i>
 
@@ -1827,11 +1826,11 @@
 
                                                 <div>
 
-                                                    <div class="fighter-name">
-                                                        MMA Fighter One
+                                                    <div class="flighter-name">
+                                                        MMA Flighter One
                                                     </div>
 
-                                                    <div class="fighter-record">
+                                                    <div class="flighter-record">
                                                         15 - 2 - 0
                                                     </div>
 
@@ -1851,11 +1850,11 @@
                                         </div>
 
 
-                                        <div class="fighter">
+                                        <div class="flighter">
 
-                                            <div class="fighter-info">
+                                            <div class="flighter-info">
 
-                                                <div class="fighter-avatar">
+                                                <div class="flighter-avatar">
 
                                                     <i class="fa-solid fa-user"></i>
 
@@ -1863,11 +1862,11 @@
 
                                                 <div>
 
-                                                    <div class="fighter-name">
-                                                        MMA Fighter Two
+                                                    <div class="flighter-name">
+                                                        MMA Flighter Two
                                                     </div>
 
-                                                    <div class="fighter-record">
+                                                    <div class="flighter-record">
                                                         13 - 1 - 1
                                                     </div>
 
@@ -1910,7 +1909,7 @@
                                             href="#"
                                             class="primary-btn"
                                         >
-                                            Fight Details
+                                            Flight Details
                                         </a>
 
                                     </div>
@@ -1959,11 +1958,11 @@
                         <div>
 
                             <strong>
-                                Live Fights
+                                Live Flights
                             </strong>
 
                             <small class="d-block text-muted">
-                                Follow fights happening now
+                                Follow flights happening now
                             </small>
 
                         </div>
@@ -1985,7 +1984,7 @@
                         <div>
 
                             <strong>
-                                Upcoming Fights
+                                Upcoming Flights
                             </strong>
 
                             <small class="d-block text-muted">
@@ -2011,7 +2010,7 @@
                         <div>
 
                             <strong>
-                                Fight History
+                                Flight History
                             </strong>
 
                             <small class="d-block text-muted">
@@ -2026,7 +2025,7 @@
 
 
 
-                <!-- FIGHT INFORMATION -->
+                <!-- FLIGHT INFORMATION -->
 
                 <div class="custom-card mb-3">
 
@@ -2034,7 +2033,7 @@
 
                         <i class="bi bi-info-circle me-2"></i>
 
-                        Fight Information
+                        Flight Information
 
                     </h6>
 
@@ -2054,7 +2053,7 @@
                             </strong>
 
                             <p class="text-muted small mb-0">
-                                Follow live fight events and updates.
+                                Follow live flight events and updates.
                             </p>
 
                         </div>
@@ -2077,7 +2076,7 @@
                             </strong>
 
                             <p class="text-muted small mb-0">
-                                Keep track of scheduled fights.
+                                Keep track of scheduled flights.
                             </p>
 
                         </div>
@@ -2096,11 +2095,11 @@
                         <div>
 
                             <strong>
-                                Fighter Records
+                                Flighter Records
                             </strong>
 
                             <p class="text-muted small mb-0">
-                                View fighter records and profiles.
+                                View flighter records and profiles.
                             </p>
 
                         </div>
@@ -2125,8 +2124,8 @@
 
                     <p class="text-muted small mb-0">
 
-                        Get the latest information about fight events,
-                        schedules and results through your BillVexa dashboard.
+                        Get the latest information about flight events,
+                        schedules and results through your {{ $setting->site_name ?? 'BillVexa' }} dashboard.
 
                     </p>
 
@@ -2215,16 +2214,16 @@
             document.getElementById('fightSearch');
 
         const typeFilter =
-            document.getElementById('fightType');
+            document.getElementById('flightType');
 
-        const fightItems =
-            document.querySelectorAll('.fight-item');
+        const flightItems =
+            document.querySelectorAll('.flight-item');
 
         const clearButton =
             document.getElementById('clearFilters');
 
 
-        function filterFights() {
+        function filterFlights() {
 
             const search =
                 searchInput.value
@@ -2236,7 +2235,7 @@
                     .toLowerCase();
 
 
-            fightItems.forEach(item => {
+            flightItems.forEach(item => {
 
                 const text =
                     item.textContent
@@ -2277,7 +2276,7 @@
 
             searchInput.addEventListener(
                 'input',
-                filterFights
+                filterFlights
             );
 
         }
@@ -2287,7 +2286,7 @@
 
             typeFilter.addEventListener(
                 'change',
-                filterFights
+                filterFlights
             );
 
         }
@@ -2303,7 +2302,7 @@
 
                     typeFilter.value = 'all';
 
-                    filterFights();
+                    filterFlights();
 
                 }
             );

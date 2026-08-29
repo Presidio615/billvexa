@@ -64,10 +64,10 @@
             top: 0;
             left: 0;
 
-            background: linear-gradient(
+            background:linear-gradient(
                 180deg,
-                blueviolet,
-                #4b49f5
+                #5b21b6,
+                #2563eb
             );
 
             padding: 25px 15px;
@@ -587,7 +587,7 @@
                 </h3>
 
                 <p class="text-muted mb-0">
-                    Search and book your next trip with BillVexa.
+                    Search and book your next trip with {{ $setting->site_name ?? 'BillVexa' }}.
                 </p>
 
             </div>

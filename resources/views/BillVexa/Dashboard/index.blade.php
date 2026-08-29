@@ -787,7 +787,7 @@
 
                         <!-- Education -->
                         <div class="col-6 col-md-4 col-lg-3">
-                            <a href=""
+                            <a href="{{ Route('education') }}"
                             class="text-decoration-none">
 
                                 <div class="card border-0 shadow-sm h-100 text-center p-4">

@@ -444,7 +444,7 @@
 
                 <!-- Ticket -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href="" class="service-item text-center">
+                    <a href="{{ route('ticket') }}" class="service-item text-center">
                         <div class="icon-box dark">
                             <i class="bi bi-ticket-fill"></i>
                         </div>

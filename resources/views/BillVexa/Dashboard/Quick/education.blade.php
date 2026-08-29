@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Education | BillVexa</title>
+    <title>Education | {{ $setting->site_name ?? 'BillVexa' }}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -29,8 +29,8 @@
 
     background:linear-gradient(
         180deg,
-        blueviolet,
-        #4b49f5
+        #5b21b6,
+        #2563eb
     );
 
     padding:25px 15px;
@@ -638,7 +638,7 @@
                     <h6>School Fees</h6>
 
                     <p>
-                        Pay school fees from your BillVexa wallet.
+                        Pay school fees from your {{ $setting->site_name ?? 'BillVexa' }} wallet.
                     </p>
 
                     <a href="#" class="service-btn">

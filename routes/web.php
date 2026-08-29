@@ -331,6 +331,10 @@ Route::middleware('auth')->group(function () {
         return view('BillVexa.Dashboard.Quick.gift-card');
     })->name('gift-card');
 
+    Route::get('/quick/ticket', function () {
+        return view('BillVexa.Dashboard.Quick.ticket');
+    })->name('ticket');
+
     /*
     |--------------------------------------------------------------------------
     | Admin Bank Accounts

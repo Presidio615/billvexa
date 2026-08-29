@@ -125,8 +125,8 @@
     .tv-card{
 
         background:linear-gradient(
-            135deg,
-            #9333ea,
+            180deg,
+            #5b21b6,
             #2563eb
         );
 

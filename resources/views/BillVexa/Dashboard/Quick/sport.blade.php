@@ -63,12 +63,11 @@
             top: 0;
             left: 0;
 
-            background: linear-gradient(
+            background:linear-gradient(
                 180deg,
-                blueviolet,
-                #4b49f5
+                #5b21b6,
+                #2563eb
             );
-
             padding: 25px 15px;
 
             z-index: 1000;
@@ -743,7 +742,7 @@
             </div>
 
             <h2 class="fw-bold">
-                Welcome to BillVexa Sports
+                Welcome to {{ $setting->site_name ?? 'BillVexa' }} Sports
             </h2>
 
             <p class="mb-0 opacity-75">

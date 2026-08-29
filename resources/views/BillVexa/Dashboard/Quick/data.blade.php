@@ -50,10 +50,10 @@
         left:0;
 
         background:linear-gradient(
-            180deg,
-            #2563eb,
-            #4f46e5
-        );
+                180deg,
+                #5b21b6,
+                #2563eb
+            );
 
         padding:25px 15px;
 

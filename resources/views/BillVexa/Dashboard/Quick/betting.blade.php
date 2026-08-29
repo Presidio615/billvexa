@@ -36,7 +36,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.c
         position:fixed;
         top:0;
         left:0;
-        background:linear-gradient(180deg,#5b21b6,#2563eb);
+        background:linear-gradient(
+                180deg,
+                #5b21b6,
+                #2563eb
+            );
         padding:25px 15px;
         z-index:1000;
     }
