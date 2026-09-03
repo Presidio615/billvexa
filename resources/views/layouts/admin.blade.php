@@ -66,11 +66,11 @@
         }
 
         .notification-message{
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    line-height: 1.5;
-}
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+        }
 
         .input-group-text{
             background:#f8f9fa;
@@ -502,18 +502,18 @@
 
 
         @if(session('success'))
-<div class="alert alert-success alert-dismissible fade show">
-    {{ session('success') }}
-    <button class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('success') }}
+                <button class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
 
-@if(session('error'))
-<div class="alert alert-danger alert-dismissible fade show">
-    {{ session('error') }}
-    <button class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ session('error') }}
+                <button class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
         @yield('content')
 
