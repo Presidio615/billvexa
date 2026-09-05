@@ -724,7 +724,7 @@
                                     class="form-control"
                                     placeholder="Enter amount"
                                     value="{{ old('amount') }}"
-                                    min="1"
+                                    min="50"
                                     step="0.01"
                                 >
 

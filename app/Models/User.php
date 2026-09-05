@@ -130,5 +130,11 @@ public function payments()
 {
     return $this->hasMany(Payment::class);
 }
+public function electricityTransactions()
+{
+    return $this->hasMany(
+        \App\Models\ElectricityTransaction::class
+    );
+}
     
 }

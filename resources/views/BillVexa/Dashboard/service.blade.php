@@ -354,7 +354,7 @@
 
                 <!-- Cable TV -->
                 <div class="col-4 col-md-3 col-lg-2">
-                    <a href={{ route('cable') }} class="service-item text-center">
+                    <a href={{ route('cable.tv') }} class="service-item text-center">
                         <div class="icon-box orange">
                             <i class="bi bi-tv-fill"></i>
                         </div>

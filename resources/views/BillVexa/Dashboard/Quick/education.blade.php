@@ -1,181 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Education | {{ $setting->site_name ?? 'BillVexa' }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>
+        Education | {{ $setting->site_name ?? 'BillVexa' }}
+    </title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
 
     <style>
+
         body {
             background: #f5f7fb;
             font-family: Inter, Arial, sans-serif;
         }
 
-/* SIDEBAR */
-.sidebar{
+        /* SIDEBAR */
 
-    width:260px;
-    height:100vh;
-
-    position:fixed;
-    top:0;
-    left:0;
-
-    background:linear-gradient(
-        180deg,
-        #5b21b6,
-        #2563eb
-    );
-
-    padding:25px 15px;
-
-    z-index:1000;
-}
-
-.logo{
-
-    color:white;
-
-    font-size:28px;
-    font-weight:bold;
-
-    margin-bottom:40px;
-}
-
-.sidebar a{
-
-    display:flex;
-    align-items:center;
-    gap:12px;
-
-    color:rgba(255,255,255,.8);
-
-    text-decoration:none;
-
-    padding:14px 16px;
-
-    border-radius:14px;
-
-    margin-bottom:10px;
-
-    transition:.3s ease;
-}
-
-.sidebar a:hover,
-.sidebar a.active{
-
-    background:rgba(255,255,255,.15);
-
-    color:white;
-
-    transform:translateX(5px);
-}
-
-        .brand {
-            font-size: 24px;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 35px;
-            padding-left: 12px;
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(
+                180deg,
+                #5b21b6,
+                #2563eb
+            );
+            padding: 25px 15px;
+            z-index: 1000;
         }
 
-        .brand span {
-            color: #635bff;
-        }
-
-        .nav-link {
-            color: #667085;
-            padding: 13px 15px;
-            margin-bottom: 5px;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-
-        .nav-link i {
-            margin-right: 12px;
-            font-size: 18px;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: #635bff;
+        .logo {
             color: white;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 40px;
         }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,.8);
+            text-decoration: none;
+            padding: 14px 16px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            transition: .3s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: rgba(255,255,255,.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* MAIN */
 
         .main {
-            margin-left: 250px;
+            margin-left: 260px;
             padding: 25px 35px;
         }
 
-    /* TOPBAR */
-    .topbar{
+        /* TOPBAR */
 
-        background:white;
-
-        padding:18px 25px;
-
-        border-radius:20px;
-
-        box-shadow:0 5px 20px rgba(0,0,0,.05);
-
-        margin-bottom:30px;
-    }
-
-        .notification {
-            width: 42px;
-            height: 42px;
+        .topbar {
             background: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,.05);
-            position: relative;
+            padding: 18px 25px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.05);
+            margin-bottom: 30px;
         }
 
-        .notification span {
-            position: absolute;
-            top: 2px;
-            right: 1px;
-            width: 8px;
-            height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-        }
-
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: 15px;
-        }
-
-        .avatar {
-            width: 42px;
-            height: 42px;
-            background: #635bff;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .btn-light-custom {
-            background: white;
-            color: #635bff;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 9px;
-            font-weight: 600;
-        }
+        /* EDUCATION CARDS */
 
         .education-card {
             background: white;
@@ -223,10 +138,14 @@
             text-decoration: none;
         }
 
+        /* SECTION */
+
         .section-title {
             font-weight: 750;
             margin-bottom: 18px;
         }
+
+        /* QUICK ACTION */
 
         .quick-card {
             background: white;
@@ -243,6 +162,7 @@
             text-decoration: none;
             padding: 12px;
             border-radius: 10px;
+            cursor: pointer;
         }
 
         .quick-action:hover {
@@ -260,6 +180,8 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* TRANSACTIONS */
 
         .transaction-card {
             background: white;
@@ -300,65 +222,140 @@
             color: #f59e0b;
             font-weight: 600;
         }
+        
 
-        @media(max-width: 991px) {
-            .sidebar {
-                width: 70px;
-                padding: 20px 10px;
-            }
+        /* =========================================================
+   EDUCATION PLAN CUSTOM DROPDOWN
+========================================================= */
 
-            .brand {
-                font-size: 18px;
-                text-align: center;
-                padding: 0;
-            }
+.education-plan-select {
+    position: relative;
+    width: 100%;
+}
 
-            .brand-text,
-            .nav-link span {
-                display: none;
-            }
+.education-plan-button {
+    width: 100%;
+    min-height: 38px;
 
-            .nav-link {
-                text-align: center;
-            }
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
 
-            .nav-link i {
-                margin: 0;
-            }
+    padding: 8px 12px;
 
-            .main {
-                margin-left: 70px;
-                padding: 20px;
-            }
-        }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-        @media(max-width: 576px) {
-            .main {
-                margin-left: 0;
-                padding: 15px;
-                padding-bottom: 80px;
-            }
+    text-align: left;
 
-            .sidebar {
-                display: none;
-            }
+    color: #212529;
+    font-size: 14px;
 
-            .topbar {
-                margin-bottom: 20px;
-            }
+    cursor: pointer;
 
-            .profile-name {
-                display: none;
-            }
+    transition: .15s ease;
+}
 
-            .balance {
-                font-size: 28px;
-            }
+.education-plan-button:hover {
+    border-color: #86b7fe;
+}
 
-            .mobile-nav {
-                display: flex !important;
-            }
-        }
+.education-plan-button:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+}
+
+.education-plan-button i {
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+
+/* DROPDOWN */
+
+.education-plan-dropdown {
+    position: absolute;
+
+    top: calc(100% + 4px);
+    left: 0;
+
+    width: 100%;
+
+    background: #fff;
+
+    border: 1px solid #dee2e6;
+    border-radius: 7px;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.12);
+
+    max-height: 220px;
+
+    overflow-y: auto;
+
+    z-index: 1060;
+
+    display: none;
+}
+
+
+/* SHOW */
+
+.education-plan-dropdown.show {
+    display: block;
+}
+
+
+/* OPTION */
+
+.education-plan-option {
+    padding: 10px 12px;
+
+    font-size: 14px;
+
+    color: #212529;
+
+    cursor: pointer;
+
+    border-bottom: 1px solid #f1f1f1;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+}
+
+.education-plan-option:last-child {
+    border-bottom: none;
+}
+
+.education-plan-option:hover {
+    background: #f5f7ff;
+}
+
+.education-plan-option.active {
+    background: #f0efff;
+    color: #635bff;
+}
+
+
+/* MOBILE */
+
+@media(max-width:576px) {
+
+    .education-plan-dropdown {
+        max-height: 200px;
+    }
+
+    .education-plan-option {
+        padding: 11px 12px;
+        font-size: 13px;
+    }
+
+}
+
+        /* MOBILE NAV */
 
         .mobile-nav {
             display: none;
@@ -390,78 +387,178 @@
         .mobile-nav a.active {
             color: #635bff;
         }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 991px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+
+            .logo {
+                font-size: 18px;
+                text-align: center;
+                padding: 0;
+            }
+
+            .brand-text,
+            .nav-link span {
+                display: none;
+            }
+
+            .sidebar a span {
+                display: none;
+            }
+
+            .sidebar a {
+                justify-content: center;
+                padding: 14px 10px;
+            }
+
+            .main {
+                margin-left: 70px;
+                padding: 20px;
+            }
+
+        }
+
+        @media(max-width: 576px) {
+
+            .main {
+                margin-left: 0;
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+
+            .sidebar {
+                display: none !important;
+            }
+
+            .topbar {
+                margin-bottom: 20px;
+            }
+
+            .profile-name {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex !important;
+            }
+
+        }
+
     </style>
+
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-  <div class="sidebar d-none d-lg-flex flex-column">
 
-  <h4 class="mb-4 d-flex align-items-center logo mb-5 text-white fs-2 fw-bold">
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
 
-      @if($setting && $setting->logo)
+<div class="sidebar d-none d-lg-flex flex-column">
 
-          <img src="{{ asset('storage/'.$setting->logo) }}"
-              width="40"
-              height="40"
-              class="rounded me-2">
+    <h4 class="logo mb-5 d-flex align-items-center text-white fs-2 fw-bold">
 
-      @else
+        @if($setting && $setting->logo)
 
-          <i class="bi bi-grid me-2"></i>
+            <img
+                src="{{ asset('storage/' . $setting->logo) }}"
+                width="40"
+                height="40"
+                class="rounded me-2"
+                alt="{{ $setting->site_name ?? 'BillVexa' }}"
+            >
 
-      @endif
+        @else
 
-      {{ $setting->site_name ?? 'BillVexa' }}
+            <i class="bi bi-grid me-2"></i>
 
-  </h4>
+        @endif
 
-  <a href={{ route('dashboard') }}>
-      <i class="bi bi-grid-fill"></i>
-      Dashboard
-  </a>
+        {{ $setting->site_name ?? 'BillVexa' }}
 
-  <a href={{ route('service') }} >
-      <i class="bi bi-gear"></i>
-      Services
-  </a>
+    </h4>
 
-  <a href={{ route('refer') }} >
-      <i class="bi bi-people"></i>
-      Refer & Earn
-  </a>
 
-  <a href={{ route('history') }} >
-      <i class="bi bi-clock-history"></i>
-      Transactions
-  </a>
+    <a href="{{ route('dashboard') }}">
 
-  <a href={{ route('profile.edit') }} >
+        <i class="bi bi-grid-fill"></i>
 
-      <i class="bi bi-person-lines-fill"></i>
-      Profile
-  </a>
+        <span>Dashboard</span>
+
+    </a>
+
+
+    <a href="{{ route('service') }}">
+
+        <i class="bi bi-gear"></i>
+
+        <span>Services</span>
+
+    </a>
+
+
+    <a href="{{ route('refer') }}">
+
+        <i class="bi bi-people"></i>
+
+        <span>Refer & Earn</span>
+
+    </a>
+
+
+    <a href="{{ route('history') }}">
+
+        <i class="bi bi-clock-history"></i>
+
+        <span>Transactions</span>
+
+    </a>
+
+
+    <a href="{{ route('profile.edit') }}">
+
+        <i class="bi bi-person-lines-fill"></i>
+
+        <span>Profile</span>
+
+    </a>
 
 </div>
 
 
-<!-- MAIN -->
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
 <main class="main">
 
+
     <!-- TOPBAR -->
+
     <div class="topbar">
 
-        <div>
-            <h4>Education</h4>
-            <small class="text-muted">
-                Access educational services easily
-            </small>
-        </div>
+        <h4 class="mb-1">
+            Education
+        </h4>
+
+        <small class="text-muted">
+            Access educational services easily
+        </small>
+
     </div>
 
 
-    <!-- BALANCE + QUICK ACTION -->
+    <!-- =====================================================
+         QUICK ACTIONS
+    ====================================================== -->
+
     <div class="row g-4 mb-4">
 
         <div class="col-lg-4">
@@ -472,30 +569,54 @@
                     Quick Actions
                 </h6>
 
-                <a href="#" class="quick-action">
+
+                <a
+                    href="javascript:void(0)"
+                    class="quick-action"
+                    onclick="openEducation('jamb')"
+                >
+
                     <div class="quick-icon">
+
                         <i class="bi bi-receipt"></i>
+
                     </div>
 
                     <div>
+
                         <strong>Buy PIN</strong>
+
                         <small class="d-block text-muted">
                             Get examination PIN
                         </small>
+
                     </div>
+
                 </a>
 
-                <a href="#" class="quick-action">
+
+                <a
+                    href="javascript:void(0)"
+                    class="quick-action"
+                    onclick="openEducation('waec')"
+                >
+
                     <div class="quick-icon">
+
                         <i class="bi bi-search"></i>
+
                     </div>
 
                     <div>
+
                         <strong>Check Result</strong>
+
                         <small class="d-block text-muted">
                             Check examination result
                         </small>
+
                     </div>
+
                 </a>
 
             </div>
@@ -505,42 +626,57 @@
     </div>
 
 
-    <!-- SERVICES -->
+    <!-- =====================================================
+         SERVICES
+    ====================================================== -->
+
     <div class="mb-4">
 
-        <div class="d-flex justify-content-between align-items-center">
-            <h5 class="section-title">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h5 class="section-title mb-0">
                 Education Services
             </h5>
 
             <span class="text-muted small">
-                6 Services
+                {{ $setting->site_name ?? 'BillVexa' }} Education
             </span>
+
         </div>
 
 
         <div class="row g-3">
 
+
             <!-- JAMB -->
+
             <div class="col-6 col-md-4">
 
-                <div class="education-card"
-                     onclick="openEducation('JAMB')">
+                <div
+                    class="education-card"
+                    onclick="openEducation('jamb')"
+                >
 
                     <div class="service-icon">
+
                         <i class="bi bi-mortarboard"></i>
+
                     </div>
 
-                    <h6>JAMB</h6>
+                    <h6>
+                        JAMB
+                    </h6>
 
                     <p>
                         Purchase JAMB examination PIN and services.
                     </p>
 
-                    <a href="#" class="service-btn">
+                    <span class="service-btn">
+
                         Continue
                         <i class="bi bi-arrow-right"></i>
-                    </a>
+
+                    </span>
 
                 </div>
 
@@ -548,140 +684,84 @@
 
 
             <!-- WAEC -->
+
             <div class="col-6 col-md-4">
 
-                <div class="education-card"
-                     onclick="openEducation('WAEC')">
+                <div
+                    class="education-card"
+                    onclick="openEducation('waec')"
+                >
 
                     <div class="service-icon">
+
                         <i class="bi bi-file-earmark-text"></i>
+
                     </div>
 
-                    <h6>WAEC</h6>
+                    <h6>
+                        WAEC
+                    </h6>
 
                     <p>
-                        Check WAEC results and purchase result PINs.
+                        Purchase WAEC result checker services.
                     </p>
 
-                    <a href="#" class="service-btn">
+                    <span class="service-btn">
+
                         Continue
                         <i class="bi bi-arrow-right"></i>
-                    </a>
+
+                    </span>
 
                 </div>
 
             </div>
 
 
-            <!-- NECO -->
+            <!-- WAEC REGISTRATION -->
+
             <div class="col-6 col-md-4">
 
-                <div class="education-card"
-                     onclick="openEducation('NECO')">
+                <div
+                    class="education-card"
+                    onclick="openEducation('waec-registration')"
+                >
 
                     <div class="service-icon">
-                        <i class="bi bi-journal-check"></i>
+
+                        <i class="bi bi-pencil-square"></i>
+
                     </div>
 
-                    <h6>NECO</h6>
+                    <h6>
+                        WAEC Registration
+                    </h6>
 
                     <p>
-                        Access NECO result checking services.
+                        Access available WAEC registration services.
                     </p>
 
-                    <a href="#" class="service-btn">
+                    <span class="service-btn">
+
                         Continue
                         <i class="bi bi-arrow-right"></i>
-                    </a>
+
+                    </span>
 
                 </div>
 
             </div>
 
-
-            <!-- NABTEB -->
-            <div class="col-6 col-md-4">
-
-                <div class="education-card"
-                     onclick="openEducation('NABTEB')">
-
-                    <div class="service-icon">
-                        <i class="bi bi-award"></i>
-                    </div>
-
-                    <h6>NABTEB</h6>
-
-                    <p>
-                        Check NABTEB examination results.
-                    </p>
-
-                    <a href="#" class="service-btn">
-                        Continue
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <!-- SCHOOL FEES -->
-            <div class="col-6 col-md-4">
-
-                <div class="education-card"
-                     onclick="openEducation('School Fees')">
-
-                    <div class="service-icon">
-                        <i class="bi bi-building"></i>
-                    </div>
-
-                    <h6>School Fees</h6>
-
-                    <p>
-                        Pay school fees from your {{ $setting->site_name ?? 'BillVexa' }} wallet.
-                    </p>
-
-                    <a href="#" class="service-btn">
-                        Continue
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <!-- RESULT CHECKER -->
-            <div class="col-6 col-md-4">
-
-                <div class="education-card"
-                     onclick="openEducation('Result Checker')">
-
-                    <div class="service-icon">
-                        <i class="bi bi-patch-check"></i>
-                    </div>
-
-                    <h6>Result Checker</h6>
-
-                    <p>
-                        Check supported examination results.
-                    </p>
-
-                    <a href="#" class="service-btn">
-                        Continue
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-
-                </div>
-
-            </div>
 
         </div>
 
     </div>
 
 
-    <!-- RECENT TRANSACTIONS -->
+    <!-- =====================================================
+         RECENT TRANSACTIONS
+    ====================================================== -->
+
     <div class="mb-4">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -690,9 +770,11 @@
                 Recent Education Transactions
             </h5>
 
-            <a href="{{ url('/dashboard/history') }}"
-               class="text-decoration-none"
-               style="color:#635bff;">
+            <a
+                href="{{ route('history') }}"
+                class="text-decoration-none"
+                style="color:#635bff;"
+            >
                 View All
             </a>
 
@@ -701,97 +783,88 @@
 
         <div class="transaction-card">
 
-            <!-- Transaction 1 -->
-            <div class="transaction-row">
+            @forelse($transactions ?? [] as $transaction)
 
-                <div class="d-flex align-items-center gap-3">
+                <div class="transaction-row">
 
-                    <div class="transaction-icon">
-                        <i class="bi bi-mortarboard"></i>
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="transaction-icon">
+
+                            <i class="bi bi-mortarboard"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+
+                                {{ $transaction->service_name ?? $transaction->service_id }}
+
+                            </strong>
+
+                            <small class="d-block text-muted">
+
+                                {{ $transaction->created_at?->format('d M, h:i A') }}
+
+                            </small>
+
+                        </div>
+
                     </div>
 
-                    <div>
-                        <strong>JAMB PIN</strong>
-                        <small class="d-block text-muted">
-                            Today, 10:24 AM
+
+                    <div class="text-end">
+
+                        <strong>
+
+                            ₦{{ number_format($transaction->amount ?? 0, 2) }}
+
+                        </strong>
+
+
+                        @php
+
+                            $status = strtolower(
+                                $transaction->status ?? 'pending'
+                            );
+
+                        @endphp
+
+
+                        <small class="d-block
+
+                            {{ in_array($status, ['successful', 'success', 'completed'])
+                                ? 'success'
+                                : (in_array($status, ['processing', 'pending'])
+                                    ? 'pending'
+                                    : 'text-danger') }}"
+
+                        >
+
+                            {{ ucfirst($status) }}
+
                         </small>
+
                     </div>
 
                 </div>
 
-                <div class="text-end">
+            @empty
 
-                    <strong>₦5,000</strong>
+                <div class="text-center p-4">
 
-                    <small class="d-block success">
-                        Successful
-                    </small>
+                    <i class="bi bi-receipt fs-2 text-muted"></i>
 
-                </div>
+                    <p class="text-muted mt-2 mb-0">
 
-            </div>
+                        No education transactions yet.
 
-
-            <!-- Transaction 2 -->
-            <div class="transaction-row">
-
-                <div class="d-flex align-items-center gap-3">
-
-                    <div class="transaction-icon">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </div>
-
-                    <div>
-                        <strong>WAEC Result Checker</strong>
-                        <small class="d-block text-muted">
-                            Yesterday, 3:15 PM
-                        </small>
-                    </div>
+                    </p>
 
                 </div>
 
-                <div class="text-end">
-
-                    <strong>₦1,500</strong>
-
-                    <small class="d-block success">
-                        Successful
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <!-- Transaction 3 -->
-            <div class="transaction-row">
-
-                <div class="d-flex align-items-center gap-3">
-
-                    <div class="transaction-icon">
-                        <i class="bi bi-building"></i>
-                    </div>
-
-                    <div>
-                        <strong>School Fees</strong>
-                        <small class="d-block text-muted">
-                            25 Aug, 11:40 AM
-                        </small>
-                    </div>
-
-                </div>
-
-                <div class="text-end">
-
-                    <strong>₦35,000</strong>
-
-                    <small class="d-block pending">
-                        Pending
-                    </small>
-
-                </div>
-
-            </div>
+            @endforelse
 
         </div>
 
@@ -800,78 +873,1160 @@
 </main>
 
 
-<!-- MOBILE NAV -->
-<div class="mobile-nav">
+<!-- =========================================================
+     EDUCATION MODAL
+========================================================= -->
 
-    <!-- Home -->
-        <a href="{{ route('dashboard') }}">
+<div
+    class="modal fade"
+    id="educationModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
 
-            <i class="bi bi-grid-fill"></i>
+    <div class="modal-dialog modal-dialog-centered">
 
-            <small>
-                Home
-            </small>
+        <div class="modal-content">
 
-        </a>
+            <div class="modal-header">
 
+                <h5
+                    class="modal-title"
+                    id="educationModalTitle"
+                >
+                    Education Service
+                </h5>
 
-        <!-- Services -->
-        <a href="{{ route('service') }}">
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
 
-            <i class="bi bi-gear"></i>
-
-            <small>
-                Services
-            </small>
-
-        </a>
-
-
-        <!-- Refer -->
-        <a href="{{ route('refer') }}">
-
-            <i class="bi bi-people"></i>
-
-            <small>
-                Refer & Earn
-            </small>
-
-        </a>
+            </div>
 
 
-        <!-- History -->
-        <a href="{{ route('history') }}">
+            <div class="modal-body">
 
-            <i class="bi bi-clock-history"></i>
+                <!-- LOADING -->
 
-            <small>
-                History
-            </small>
+                <div
+                    id="educationLoading"
+                    class="text-center py-4"
+                >
 
-        </a>
+                    <div
+                        class="spinner-border text-primary"
+                        role="status"
+                    ></div>
+
+                    <p class="text-muted mt-2 mb-0">
+                        Loading available plans...
+                    </p>
+
+                </div>
 
 
-        <!-- Profile -->
-        <a href="{{ route('profile.edit') }}">
+                <!-- ERROR -->
 
-            <i class="bi bi-person-lines-fill"></i>
+                <div
+                    id="educationError"
+                    class="alert alert-danger d-none"
+                ></div>
 
-            <small>
-                Profile
-            </small>
 
-        </a>
+                <!-- FORM -->
+
+                <form
+                    id="educationForm"
+                    class="d-none"
+                >
+
+                    <input
+                        type="hidden"
+                        id="educationServiceId"
+                    >
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Select Plan
+                        </label>
+
+                        <div
+                            class="education-plan-select"
+                            id="educationPlanSelect"
+                        >
+
+                            <button
+                                type="button"
+                                class="education-plan-button"
+                                id="educationVariationButton"
+                            >
+                                <span id="educationVariationText">
+                                    Select a plan
+                                </span>
+
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+
+
+                            <div
+                                class="education-plan-dropdown"
+                                id="educationVariationDropdown"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- JAMB PROFILE -->
+
+                    <div
+                        class="mb-3 d-none"
+                        id="jambProfileGroup"
+                    >
+
+                        <label
+                            for="jambProfile"
+                            class="form-label"
+                        >
+                            JAMB Profile ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="jambProfile"
+                            class="form-control"
+                            placeholder="Enter JAMB Profile ID"
+                        >
+
+                        <small class="text-muted">
+                            Your JAMB profile will be verified before payment.
+                        </small>
+
+                    </div>
+
+
+                    <!-- BILLER -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="educationBiller"
+                            class="form-label"
+                        >
+                            Reference / Candidate Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="educationBiller"
+                            class="form-control"
+                            placeholder="Enter required number"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="educationPhone"
+                            class="form-label"
+                        >
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="educationPhone"
+                            class="form-control"
+                            placeholder="08012345678"
+                            maxlength="11"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- AMOUNT -->
+
+                    <div
+                        id="educationAmountContainer"
+                        class="alert alert-light d-none"
+                    >
+
+                        <div class="d-flex justify-content-between">
+
+                            <span>
+                                Amount
+                            </span>
+
+                            <strong id="educationAmount">
+                                ₦0.00
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                        id="educationPurchaseButton"
+                    >
+
+                        Continue to Payment
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
 
-<script>
-    function openEducation(service) {
+<!-- =========================================================
+     MOBILE NAV
+========================================================= -->
 
-        // Replace this with your Laravel route later
-        alert(service + " service selected");
+<div class="mobile-nav">
+
+    <a href="{{ route('dashboard') }}">
+
+        <i class="bi bi-grid-fill"></i>
+
+        <small>
+            Home
+        </small>
+
+    </a>
+
+
+    <a href="{{ route('service') }}">
+
+        <i class="bi bi-gear"></i>
+
+        <small>
+            Services
+        </small>
+
+    </a>
+
+
+    <a href="{{ route('refer') }}">
+
+        <i class="bi bi-people"></i>
+
+        <small>
+            Refer
+        </small>
+
+    </a>
+
+
+    <a href="{{ route('history') }}">
+
+        <i class="bi bi-clock-history"></i>
+
+        <small>
+            History
+        </small>
+
+    </a>
+
+
+    <a href="{{ route('profile.edit') }}">
+
+        <i class="bi bi-person-lines-fill"></i>
+
+        <small>
+            Profile
+        </small>
+
+    </a>
+
+</div>
+
+
+<!-- BOOTSTRAP JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<script>
+
+let educationModal = null;
+let currentEducationService = null;
+
+
+/*
+|--------------------------------------------------------------------------
+| OPEN EDUCATION SERVICE
+|--------------------------------------------------------------------------
+*/
+
+async function openEducation(serviceId)
+{
+    currentEducationService = serviceId;
+
+    const modalElement =
+        document.getElementById('educationModal');
+
+    educationModal =
+        bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    const title =
+        document.getElementById('educationModalTitle');
+
+    const loading =
+        document.getElementById('educationLoading');
+
+    const error =
+        document.getElementById('educationError');
+
+    const form =
+        document.getElementById('educationForm');
+
+    const variationButton =
+       document.getElementById('educationVariationButton');
+
+    const variationText =
+        document.getElementById('educationVariationText');
+
+    const variationDropdown =
+        document.getElementById('educationVariationDropdown');
+
+    const jambGroup =
+        document.getElementById('jambProfileGroup');
+
+    const amountContainer =
+        document.getElementById('educationAmountContainer');
+
+    const serviceIdInput =
+        document.getElementById('educationServiceId');
+
+    const billerInput =
+        document.getElementById('educationBiller');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESET
+    |--------------------------------------------------------------------------
+    */
+
+    form.classList.add('d-none');
+
+    loading.classList.remove('d-none');
+
+    error.classList.add('d-none');
+
+    jambGroup.classList.add('d-none');
+
+    amountContainer.classList.add('d-none');
+
+    variationText.textContent = 'Select a plan';
+
+    variationDropdown.innerHTML = '';
+
+    variationDropdown.classList.remove('show');
+
+    variationButton.dataset.value = '';
+    variationButton.dataset.amount = '';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE SERVICE ID
+    |--------------------------------------------------------------------------
+    */
+
+    serviceIdInput.value = serviceId;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SERVICE TITLE
+    |--------------------------------------------------------------------------
+    */
+
+    const titles = {
+
+        'jamb': 'JAMB',
+
+        'waec': 'WAEC',
+
+        'waec-registration': 'WAEC Registration'
+
+    };
+
+    title.textContent =
+        titles[serviceId] ?? 'Education Service';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | BILLER PLACEHOLDER
+    |--------------------------------------------------------------------------
+    */
+
+    if (serviceId === 'jamb') {
+
+        billerInput.placeholder =
+            'Enter JAMB profile / candidate number';
+
+    } else if (serviceId === 'waec') {
+
+        billerInput.placeholder =
+            'Enter WAEC candidate / reference number';
+
+    } else if (serviceId === 'waec-registration') {
+
+        billerInput.placeholder =
+            'Enter registration reference';
+
+    } else {
+
+        billerInput.placeholder =
+            'Enter required reference number';
 
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW MODAL
+    |--------------------------------------------------------------------------
+    */
+
+    educationModal.show();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOAD EDUCATION PLANS
+    |--------------------------------------------------------------------------
+    */
+
+    try {
+
+        const response = await fetch(
+            `/education/variations/${encodeURIComponent(serviceId)}`,
+            {
+                method: 'GET',
+
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok || data.success === false) {
+
+            throw new Error(
+                data.message ||
+                data.error ||
+                'Unable to load education plans.'
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FIND VARIATIONS
+        |--------------------------------------------------------------------------
+        */
+
+        const variations =
+            data.content?.variations ??
+            data.content ??
+            [];
+
+
+        if (
+            !Array.isArray(variations) ||
+            variations.length === 0
+        ) {
+
+            throw new Error(
+                'No plans are currently available for this service.'
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | POPULATE PLANS
+        |--------------------------------------------------------------------------
+        */
+
+variations.forEach(plan => {
+
+    const code =
+        plan.variation_code ??
+        plan.variationCode ??
+        '';
+
+    const name =
+        plan.name ??
+        plan.variation_name ??
+        plan.variationName ??
+        'Education Plan';
+
+    const price =
+        Number(
+            plan.variation_amount ??
+            plan.amount ??
+            0
+        );
+
+
+    if (!code) {
+        return;
+    }
+
+
+    /*
+    |----------------------------------------------------------
+    | CREATE CUSTOM OPTION
+    |----------------------------------------------------------
+    */
+
+    const option =
+        document.createElement('div');
+
+    option.className =
+        'education-plan-option';
+
+
+    /*
+    |----------------------------------------------------------
+    | DISPLAY TEXT
+    |----------------------------------------------------------
+    */
+
+    const displayText =
+        price > 0
+            ? `${name} - ₦${price.toLocaleString(
+                'en-NG',
+                {
+                    minimumFractionDigits: 2
+                }
+            )}`
+            : name;
+
+
+    option.textContent =
+        displayText;
+
+
+    /*
+    |----------------------------------------------------------
+    | STORE VALUES
+    |----------------------------------------------------------
+    */
+
+    option.dataset.value =
+        code;
+
+    option.dataset.amount =
+        price;
+
+
+    /*
+    |----------------------------------------------------------
+    | SELECT PLAN
+    |----------------------------------------------------------
+    */
+
+    option.addEventListener(
+        'click',
+        function ()
+        {
+
+            /*
+            | Set selected value
+            */
+
+            variationButton.dataset.value =
+                this.dataset.value;
+
+
+            /*
+            | Set amount
+            */
+
+            variationButton.dataset.amount =
+                this.dataset.amount;
+
+
+            /*
+            | Display selected plan
+            */
+
+            variationText.textContent =
+                this.textContent;
+
+
+            /*
+            | Highlight selected
+            */
+
+            document
+                .querySelectorAll(
+                    '.education-plan-option'
+                )
+                .forEach(item => {
+
+                    item.classList.remove(
+                        'active'
+                    );
+
+                });
+
+
+            this.classList.add('active');
+
+
+            /*
+            | Close dropdown
+            */
+
+            variationDropdown.classList.remove(
+                'show'
+            );
+
+
+            /*
+            | Update amount
+            */
+
+            const amount =
+                Number(
+                    this.dataset.amount || 0
+                );
+
+
+            const container =
+                document.getElementById(
+                    'educationAmountContainer'
+                );
+
+
+            const amountElement =
+                document.getElementById(
+                    'educationAmount'
+                );
+
+
+            if (amount > 0) {
+
+                amountElement.textContent =
+                    `₦${amount.toLocaleString(
+                        'en-NG',
+                        {
+                            minimumFractionDigits: 2
+                        }
+                    )}`;
+
+                container.classList.remove(
+                    'd-none'
+                );
+
+            } else {
+
+                amountElement.textContent =
+                    '₦0.00';
+
+                container.classList.add(
+                    'd-none'
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+    | Add option
+    */
+
+    variationDropdown.appendChild(
+        option
+    );
+
+});
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | JAMB
+        |--------------------------------------------------------------------------
+        */
+
+        if (serviceId === 'jamb') {
+
+            jambGroup.classList.remove('d-none');
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SHOW FORM
+        |--------------------------------------------------------------------------
+        */
+
+        loading.classList.add('d-none');
+
+        form.classList.remove('d-none');
+
+
+    } catch (error) {
+
+        console.error(
+            'Education variation error:',
+            error
+        );
+
+        loading.classList.add('d-none');
+
+        errorBox(
+            error.message ||
+            'Unable to load education plans.'
+        );
+
+    }
+
+}
+
+
+/*
+|----------------------------------------------------------------------
+| EDUCATION PLAN DROPDOWN
+|----------------------------------------------------------------------
+*/
+
+const educationVariationButton =
+    document.getElementById(
+        'educationVariationButton'
+    );
+
+const educationVariationDropdown =
+    document.getElementById(
+        'educationVariationDropdown'
+    );
+
+
+educationVariationButton.addEventListener(
+    'click',
+    function (event)
+    {
+
+        event.stopPropagation();
+
+        educationVariationDropdown.classList.toggle(
+            'show'
+        );
+
+    }
+);
+
+
+/*
+| Close when clicking outside
+*/
+
+document.addEventListener(
+    'click',
+    function (event)
+    {
+
+        const select =
+            document.getElementById(
+                'educationPlanSelect'
+            );
+
+
+        if (
+            select &&
+            !select.contains(event.target)
+        ) {
+
+            educationVariationDropdown.classList.remove(
+                'show'
+            );
+
+        }
+
+    }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ERROR BOX
+|--------------------------------------------------------------------------
+*/
+
+function errorBox(message)
+{
+    const error =
+        document.getElementById('educationError');
+
+    error.textContent =
+        message ||
+        'Something went wrong.';
+
+    error.classList.remove('d-none');
+}
+
+
+
+/*
+|--------------------------------------------------------------------------
+| EDUCATION PURCHASE
+|--------------------------------------------------------------------------
+*/
+
+document
+    .getElementById('educationForm')
+    .addEventListener(
+        'submit',
+        async function(event)
+        {
+
+            event.preventDefault();
+
+
+            const button =
+                document.getElementById(
+                    'educationPurchaseButton'
+                );
+
+
+            const serviceId =
+                document.getElementById(
+                    'educationServiceId'
+                ).value ||
+                currentEducationService;
+
+
+            const variationButton =
+                document.getElementById(
+                    'educationVariationButton'
+                );
+
+
+            const variationCode =
+                variationButton.dataset.value || '';
+
+
+            const billersCode =
+                document.getElementById(
+                    'educationBiller'
+                ).value.trim();
+
+
+            const phone =
+                document.getElementById(
+                    'educationPhone'
+                ).value.trim();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | VALIDATION
+            |--------------------------------------------------------------------------
+            */
+
+            if (!serviceId) {
+
+                alert(
+                    'Invalid education service.'
+                );
+
+                return;
+
+            }
+
+
+            if (!variationCode) {
+
+                alert(
+                    'Please select a plan.'
+                );
+
+                return;
+
+            }
+
+
+            if (!billersCode) {
+
+                alert(
+                    'Please enter the required reference number.'
+                );
+
+                return;
+
+            }
+
+
+            if (!phone) {
+
+                alert(
+                    'Please enter your phone number.'
+                );
+
+                return;
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | GET SELECTED AMOUNT
+            |--------------------------------------------------------------------------
+            */
+
+            const amount =
+                Number(
+                    variationButton.dataset.amount || 0
+                );
+
+
+            if (amount <= 0) {
+
+                alert(
+                    'Invalid education plan amount.'
+                );
+
+                return;
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DISABLE BUTTON
+            |--------------------------------------------------------------------------
+            */
+
+            button.disabled = true;
+
+            button.innerHTML = `
+                <span
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                ></span>
+                Processing...
+            `;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CSRF
+            |--------------------------------------------------------------------------
+            */
+
+            const csrfToken =
+                document
+                    .querySelector(
+                        'meta[name="csrf-token"]'
+                    )
+                    ?.getAttribute('content');
+
+
+            if (!csrfToken) {
+
+                alert(
+                    'CSRF token is missing. Please refresh the page.'
+                );
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    'Continue to Payment';
+
+                return;
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PURCHASE REQUEST
+            |--------------------------------------------------------------------------
+            */
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/education/purchase',
+                        {
+
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type':
+                                    'application/json',
+
+                                'Accept':
+                                    'application/json',
+
+                                'X-CSRF-TOKEN':
+                                    csrfToken
+
+                            },
+
+                            body: JSON.stringify({
+
+                                service_id:
+                                    serviceId,
+
+                                billers_code:
+                                    billersCode,
+
+                                variation_code:
+                                    variationCode,
+
+                                amount:
+                                    amount,
+
+                                phone:
+                                    phone
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | PENDING
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    response.status === 202 &&
+                    data.status === 'pending'
+                ) {
+
+                    alert(
+                        data.message ||
+                        'Your transaction is being processed. Please check your transaction history shortly.'
+                    );
+
+                    educationModal.hide();
+
+                    window.location.reload();
+
+                    return;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | FAILED
+                |--------------------------------------------------------------------------
+                */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        data.error ||
+                        'Education purchase failed.'
+                    );
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | SUCCESS
+                |--------------------------------------------------------------------------
+                */
+
+                if (data.success) {
+
+                    alert(
+                        data.message ||
+                        'Education service purchased successfully.'
+                    );
+
+                    educationModal.hide();
+
+                    window.location.reload();
+
+                    return;
+
+                }
+
+
+                throw new Error(
+                    data.message ||
+                    'Education purchase failed.'
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    'Education purchase error:',
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    'Unable to complete purchase.'
+                );
+
+            } finally {
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    'Continue to Payment';
+
+            }
+
+        }
+    );
+
 </script>
 
 </body>

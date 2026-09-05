@@ -2,8 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlutterwaveVirtualAccountController;
+use App\Http\Controllers\ElectricityController;
+use App\Http\Controllers\EducationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\CableTvController;
+use App\Http\Controllers\DataBundleController;
 use App\Http\Controllers\FlutterwaveController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
@@ -19,7 +23,6 @@ use App\Http\Controllers\Admin\NotificationController as AdminNotificationContro
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\DataController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminAuthController;
@@ -286,30 +289,89 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/quick/airtime', function () {
-        return view('BillVexa.Dashboard.Quick.airtime');
-    })->name('airtime');
+    Route::get(
+        '/dashboard/airtime',
+        [AirtimeController::class, 'index']
+    )->name('airtime');
 
+    Route::post(
+        '/dashboard/airtime/purchase',
+        [AirtimeController::class, 'purchase']
+    )->name('airtime.purchase');
 
-    Route::get('/quick/data', function () {
-        return view('BillVexa.Dashboard.Quick.data');
-    })->name('data');
 
     Route::get('/quick/bet', function () {
         return view('BillVexa.Dashboard.Quick.betting');
     })->name('bet');
 
-    Route::get('/quick/cable', function () {
-        return view('BillVexa.Dashboard.Quick.cable');
-    })->name('cable');
+    Route::get(
+        '/dashboard/cable-tv',
+        [CableTvController::class, 'index']
+    )->name('cable.tv');
 
-    Route::get('/quick/electricity', function () {
-        return view('BillVexa.Dashboard.Quick.Electricity');
-    })->name('electricity');
+    Route::get(
+        '/dashboard/cable-tv/plans',
+        [CableTvController::class, 'plans']
+    )->name('cable.tv.plans');
 
-    Route::get('/quick/education', function () {
-        return view('BillVexa.Dashboard.Quick.education');
-    })->name('education');
+    Route::post(
+        '/dashboard/cable-tv/verify',
+        [CableTvController::class, 'verify']
+    )->name('cable.tv.verify');
+
+    Route::post(
+        '/dashboard/cable-tv/purchase',
+        [CableTvController::class, 'purchase']
+    )->name('cable.tv.purchase');
+
+    Route::get(
+        '/dashboard/cable-tv/requery/{requestId}',
+        [CableTvController::class, 'requery']
+    )->name('cable.tv.requery');
+
+    Route::get(
+        '/dashboard/electricity',
+        [ElectricityController::class, 'index']
+    )->name('electricity');
+
+
+    Route::post(
+        '/dashboard/electricity/verify-meter',
+        [ElectricityController::class, 'verifyMeter']
+    )->name('electricity.verify');
+
+
+    Route::post(
+        '/dashboard/electricity/purchase',
+        [ElectricityController::class, 'purchase']
+    )->name('electricity.purchase');
+
+
+    Route::get(
+        '/dashboard/electricity/requery/{requestId}',
+        [ElectricityController::class, 'requery']
+    )->name('electricity.requery');
+
+
+        Route::get('/education', [EducationController::class, 'index'])
+        ->name('education');
+
+    Route::get('/education/services', [EducationController::class, 'services'])
+        ->name('dashboard.education.services');
+
+    Route::get('/education/variations/{serviceId}', [EducationController::class, 'variations'])
+        ->name('dashboard.education.variations');
+
+    Route::post('/education/verify-jamb', [EducationController::class, 'verifyJamb'])
+        ->name('dashboard.education.verify-jamb');
+
+    Route::post('/education/purchase', [EducationController::class, 'purchase'])
+        ->name('dashboard.education.purchase');
+
+    Route::get('/education/transactions', [EducationController::class, 'transactions'])
+        ->name('dashboard.education.transactions');
+
+
 
     Route::get('/quick/transport', function () {
         return view('BillVexa.Dashboard.Quick.transport');
@@ -418,11 +480,26 @@ Route::get(
 
 
 
-Route::get('/quick/data', [DataController::class, 'index'])->name('data');
 
-Route::post('/data/purchase', [DataController::class, 'purchase'])
-    ->name('data.purchase');
+    Route::get(
+        '/dashboard/data',
+        [DataBundleController::class, 'index']
+    )->name('data');
 
+    Route::get(
+        '/dashboard/data/plans',
+        [DataBundleController::class, 'plans']
+    )->name('data.plans');
+
+    Route::post(
+        '/dashboard/data/purchase',
+        [DataBundleController::class, 'purchase']
+    )->name('data.purchase');
+
+    Route::get(
+        '/dashboard/data/requery/{requestId}',
+        [DataBundleController::class, 'requery']
+    )->name('data.requery');
 
 /*
 |--------------------------------------------------------------------------

@@ -411,7 +411,7 @@
                         Buy Data Bundle
                     </h4>
 
-                    <form action="{{ route('data.purchase') }}" method="POST">
+                    <form id="dataPurchaseForm">
                         @csrf
 
                         <!-- NETWORK -->
@@ -424,16 +424,16 @@
                             <div class="row g-3">
 
                                 <div class="col-md-3 col-6">
+
                                     <label class="network-card w-100">
 
                                         <input
                                             type="radio"
                                             name="network"
-                                            value="MTN"
-                                            hidden>
+                                            value="mtn"
+                                            hidden
+                                        >
 
-                                            <input type="hidden" name="amount" id="amount">
-                                            
                                         <i class="fa-solid fa-signal fs-2 text-warning mb-2"></i>
 
                                         <h6 class="fw-bold">
@@ -444,6 +444,7 @@
 
                                 </div>
 
+
                                 <div class="col-md-3 col-6">
 
                                     <label class="network-card w-100">
@@ -452,9 +453,8 @@
                                             type="radio"
                                             name="network"
                                             value="glo"
-                                            hidden>
-
-                                            <input type="hidden" name="amount" id="amount">
+                                            hidden
+                                        >
 
                                         <i class="fa-solid fa-signal fs-2 text-success mb-2"></i>
 
@@ -466,6 +466,7 @@
 
                                 </div>
 
+
                                 <div class="col-md-3 col-6">
 
                                     <label class="network-card w-100">
@@ -474,9 +475,8 @@
                                             type="radio"
                                             name="network"
                                             value="airtel"
-                                            hidden>
-
-                                            <input type="hidden" name="amount" id="amount">
+                                            hidden
+                                        >
 
                                         <i class="fa-solid fa-signal fs-2 text-danger mb-2"></i>
 
@@ -488,6 +488,7 @@
 
                                 </div>
 
+
                                 <div class="col-md-3 col-6">
 
                                     <label class="network-card w-100">
@@ -496,9 +497,8 @@
                                             type="radio"
                                             name="network"
                                             value="9mobile"
-                                            hidden>
-
-                                            <input type="hidden" name="amount" id="amount">
+                                            hidden
+                                        >
 
                                         <i class="fa-solid fa-signal fs-2 text-primary mb-2"></i>
 
@@ -514,7 +514,9 @@
 
                         </div>
 
+
                         <!-- PHONE -->
+
                         <div class="mb-4">
 
                             <label class="form-label fw-semibold">
@@ -522,85 +524,50 @@
                             </label>
 
                             <input
-                            type="tel"
-                            name="phone"
-                            class="form-control"
-                            placeholder="Enter phone number"
-                            required>
+                                type="tel"
+                                name="phone"
+                                id="phone"
+                                class="form-control"
+                                placeholder="Enter phone number"
+                                maxlength="15"
+                                required
+                            >
 
                         </div>
 
-                        <!-- PLAN -->
+
+                        <!-- PLANS -->
+
                         <div class="mb-4">
 
-                            <label class="form-label fw-semibold">
-                                Select Data Plan
-                            </label>
+                            <div class="d-flex justify-content-between align-items-center">
 
-                            <div class="row g-3">
+                                <label class="form-label fw-semibold">
+                                    Select Data Plan
+                                </label>
 
-                                <div class="col-md-4">
+                                <span
+                                    id="planLoading"
+                                    class="text-primary small d-none"
+                                >
+                                    Loading plans...
+                                </span>
 
-                                    <label class="plan-card d-block" data-amount="350">
+                            </div>
 
-                                        <input
-                                            type="radio"
-                                            name="plan"
-                                            value="1GB Daily"
-                                            hidden>
 
-                                        <h6>1GB Daily</h6>
+                            <div
+                                id="plansContainer"
+                                class="row g-3"
+                            >
 
-                                        <small>Valid for 1 day</small>
+                                <div class="col-12">
 
-                                        <h5 class="text-primary mt-3">
-                                            ₦350
-                                        </h5>
+                                    <div class="alert alert-info mb-0">
 
-                                    </label>
-                                </div>
+                                        Select a network to load available data plans.
 
-                                <div class="col-md-4">
-
-                                    <label class="plan-card d-block" data-amount="1500">
-
-                                        <input
-                                            type="radio"
-                                            name="plan"
-                                            value="5GB Weekly"
-                                            hidden>
-
-                                        <h6>5GB Weekly</h6>
-
-                                        <small>Valid for 7 days</small>
-
-                                        <h5 class="text-primary mt-3">
-                                            ₦1,500
-                                        </h5>
-
-                                    </label>
-
-                                </div>
-
-                                <div class="col-md-4">
-
-                                    <label class="plan-card d-block" data-amount="4500">
-
-                                        <input
-                                            type="radio"
-                                            name="plan"
-                                            value="15GB Monthly"
-                                            hidden>
-
-                                        <h6>15GB Monthly</h6>
-
-                                        <small>Valid for 30 days</small>
-
-                                        <h5 class="text-primary mt-3">
-                                            ₦4,500
-                                        </h5>
-
-                                    </label>
+                                    </div>
 
                                 </div>
 
@@ -608,8 +575,55 @@
 
                         </div>
 
+
+                        <!-- SELECTED PLAN -->
+
+                        <div
+                            id="selectedPlanBox"
+                            class="alert alert-primary d-none"
+                        >
+
+                            <div class="d-flex justify-content-between">
+
+                                <span>
+                                    Selected Plan
+                                </span>
+
+                                <strong id="selectedPlanName">
+                                </strong>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+
+                                <span>
+                                    Amount
+                                </span>
+
+                                <strong id="selectedPlanAmount">
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- HIDDEN VARIATION -->
+
+                        <input
+                            type="hidden"
+                            name="variation_code"
+                            id="variation_code"
+                        >
+
+
                         <!-- BUTTON -->
-                        <button type="submit" class="buy-btn w-100">
+
+                        <button
+                            type="submit"
+                            id="buyDataBtn"
+                            class="buy-btn w-100"
+                        >
 
                             <i class="fa-solid fa-wifi me-2"></i>
 
@@ -620,6 +634,7 @@
                     </form>
 
                 </div>
+
 
             </div>
 
@@ -694,26 +709,67 @@
                             <div>
 
                                 <h6 class="mb-1">
+
                                     {{ $transaction->network }}
-                                    {{ $transaction->type }}
+
+                                    -
+
+                                    {{ $transaction->variation_name ?? 'Data Bundle' }}
+
                                 </h6>
 
                                 <small class="text-muted">
+
+                                    {{ $transaction->phone }}
+
+                                </small>
+
+                                <br>
+
+                                <small class="text-muted">
+
                                     {{ $transaction->created_at->diffForHumans() }}
+
                                 </small>
 
                             </div>
 
-                            <strong class="text-success">
-                                ₦{{ number_format($transaction->amount,2) }}
-                            </strong>
+
+                            <div class="text-end">
+
+                                <strong
+                                    class="
+                                        {{ $transaction->status === 'delivered'
+                                            ? 'text-success'
+                                            : ($transaction->status === 'pending'
+                                                ? 'text-warning'
+                                                : 'text-danger')
+                                        }}
+                                    "
+                                >
+
+                                    ₦{{ number_format($transaction->amount, 2) }}
+
+                                </strong>
+
+                                <br>
+
+                                <small>
+
+                                    {{ ucfirst($transaction->status) }}
+
+                                </small>
+
+                            </div>
 
                         </div>
 
                         @empty
 
                         <p class="text-muted text-center">
+
                             No purchases yet.
+
                         </p>
 
                     @endforelse
@@ -758,66 +814,522 @@
 
 
     <script>
-        const networkCards = document.querySelectorAll(".network-card");
 
-        networkCards.forEach(card => {
-            card.addEventListener("click", function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-                const radio = this.querySelector('input[type="radio"]');
+    const networkCards =
+        document.querySelectorAll('.network-card');
 
-                // If already selected, unselect it
-                if (this.classList.contains("clicked")) {
-                    this.classList.remove("clicked");
+    const plansContainer =
+        document.getElementById('plansContainer');
+
+    const planLoading =
+        document.getElementById('planLoading');
+
+    const selectedPlanBox =
+        document.getElementById('selectedPlanBox');
+
+    const selectedPlanName =
+        document.getElementById('selectedPlanName');
+
+    const selectedPlanAmount =
+        document.getElementById('selectedPlanAmount');
+
+    const variationCode =
+        document.getElementById('variation_code');
+
+    const form =
+        document.getElementById('dataPurchaseForm');
+
+    const buyButton =
+        document.getElementById('buyDataBtn');
+
+
+    /*
+     * Select network
+     */
+    networkCards.forEach(card => {
+
+        card.addEventListener('click', function () {
+
+            networkCards.forEach(c => {
+                c.classList.remove('clicked');
+
+                const radio =
+                    c.querySelector('input[type="radio"]');
+
+                if (radio) {
                     radio.checked = false;
-                    return;
                 }
-
-                // Remove active from all cards
-                networkCards.forEach(c => {
-                    c.classList.remove("clicked");
-                    c.querySelector('input[type="radio"]').checked = false;
-                });
-
-                // Activate current card
-                this.classList.add("clicked");
-                radio.checked = true;
-            });
-        });
-
-
-
-        const planCards = document.querySelectorAll(".plan-card");
-
-        planCards.forEach(card => {
-
-            card.addEventListener("click", function () {
-
-                const radio = this.querySelector('input[type="radio"]');
-
-                if (this.classList.contains("clicked")) {
-
-                    this.classList.remove("clicked");
-                    radio.checked = false;
-                    document.getElementById("amount").value = "";
-                    return;
-
-                }
-
-                planCards.forEach(c => {
-                    c.classList.remove("clicked");
-                    c.querySelector('input[type="radio"]').checked = false;
-                });
-
-                this.classList.add("clicked");
-                radio.checked = true;
-
-                document.getElementById("amount").value = this.dataset.amount;
-
             });
 
-        });
-    </script>
 
+            this.classList.add('clicked');
+
+            const radio =
+                this.querySelector('input[type="radio"]');
+
+            radio.checked = true;
+
+
+            /*
+             * Clear previous plan
+             */
+            variationCode.value = '';
+
+            selectedPlanBox.classList.add('d-none');
+
+            /*
+             * Load plans
+             */
+            loadPlans(radio.value);
+
+        });
+
+    });
+
+
+    /*
+     * Load plans from Laravel
+     */
+    async function loadPlans(network) {
+
+        plansContainer.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Loading available data plans...
+                </div>
+            </div>
+        `;
+
+        planLoading.classList.remove('d-none');
+
+
+        try {
+
+            const response = await fetch(
+                `{{ route('data.plans') }}?network=${encodeURIComponent(network)}`,
+                {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+
+
+            const data = await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    'Unable to load data plans.'
+                );
+
+            }
+
+
+            renderPlans(data.plans);
+
+
+        } catch (error) {
+
+            plansContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        ${escapeHtml(error.message)}
+                    </div>
+                </div>
+            `;
+
+        } finally {
+
+            planLoading.classList.add('d-none');
+
+        }
+
+    }
+
+
+    /*
+     * Display plans
+     */
+    function renderPlans(plans) {
+
+        if (!plans || plans.length === 0) {
+
+            plansContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-warning">
+                        No data plans are currently available.
+                    </div>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        plansContainer.innerHTML = '';
+
+
+        plans.forEach(plan => {
+
+            const code =
+                plan.variation_code || '';
+
+            const name =
+                plan.name || 'Data Bundle';
+
+            const amount =
+                parseFloat(
+                    plan.variation_amount || 0
+                );
+
+
+            const column =
+                document.createElement('div');
+
+            column.className =
+                'col-md-4 col-sm-6';
+
+
+            column.innerHTML = `
+
+                <label
+                    class="plan-card d-block h-100"
+                    data-code="${escapeHtml(code)}"
+                    data-name="${escapeHtml(name)}"
+                    data-amount="${amount}"
+                >
+
+                    <input
+                        type="radio"
+                        name="selected_plan"
+                        hidden
+                    >
+
+                    <h6 class="fw-bold">
+                        ${escapeHtml(name)}
+                    </h6>
+
+                    <h5 class="text-primary mt-3">
+                        ₦${amount.toLocaleString()}
+                    </h5>
+
+                </label>
+
+            `;
+
+
+            const card =
+                column.querySelector('.plan-card');
+
+
+            card.addEventListener('click', function () {
+
+                document
+                    .querySelectorAll('.plan-card')
+                    .forEach(c => {
+                        c.classList.remove('clicked');
+
+                        const radio =
+                            c.querySelector(
+                                'input[type="radio"]'
+                            );
+
+                        if (radio) {
+                            radio.checked = false;
+                        }
+                    });
+
+
+                this.classList.add('clicked');
+
+
+                const radio =
+                    this.querySelector(
+                        'input[type="radio"]'
+                    );
+
+                radio.checked = true;
+
+
+                const code =
+                    this.dataset.code;
+
+                const name =
+                    this.dataset.name;
+
+                const amount =
+                    parseFloat(
+                        this.dataset.amount
+                    );
+
+
+                variationCode.value =
+                    code;
+
+
+                selectedPlanName.textContent =
+                    name;
+
+
+                selectedPlanAmount.textContent =
+                    '₦' + amount.toLocaleString();
+
+
+                selectedPlanBox
+                    .classList
+                    .remove('d-none');
+
+            });
+
+
+            plansContainer.appendChild(column);
+
+        });
+
+    }
+
+
+    /*
+     * Purchase data
+     */
+    form.addEventListener('submit', async function (event) {
+
+        event.preventDefault();
+
+
+        const network =
+            document.querySelector(
+                'input[name="network"]:checked'
+            );
+
+        const phone =
+            document.getElementById('phone').value.trim();
+
+
+        if (!network) {
+
+            showMessage(
+                'Please select a network.',
+                'danger'
+            );
+
+            return;
+
+        }
+
+
+        if (!phone) {
+
+            showMessage(
+                'Please enter the phone number.',
+                'danger'
+            );
+
+            return;
+
+        }
+
+
+        if (!variationCode.value) {
+
+            showMessage(
+                'Please select a data plan.',
+                'danger'
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Disable button
+         */
+        buyButton.disabled = true;
+
+        buyButton.innerHTML = `
+            <span
+                class="spinner-border spinner-border-sm me-2"
+            ></span>
+            Processing...
+        `;
+
+
+        try {
+
+            const formData =
+                new FormData(form);
+
+
+            const response =
+                await fetch(
+                    `{{ route('data.purchase') }}`,
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Accept': 'application/json',
+
+                            'X-CSRF-TOKEN':
+                                document
+                                .querySelector(
+                                    'input[name="_token"]'
+                                )
+                                .value
+                        },
+
+                        body: formData
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok && data.status !== 'pending') {
+
+                throw new Error(
+                    data.message ||
+                    'Data purchase failed.'
+                );
+
+            }
+
+
+            if (data.status === 'delivered') {
+
+                showMessage(
+                    data.message ||
+                    'Data bundle purchased successfully.',
+                    'success'
+                );
+
+
+                form.reset();
+
+                variationCode.value = '';
+
+                selectedPlanBox
+                    .classList
+                    .add('d-none');
+
+
+                networkCards.forEach(card => {
+                    card.classList.remove('clicked');
+                });
+
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+
+                return;
+
+            }
+
+
+            if (data.status === 'pending') {
+
+                showMessage(
+                    data.message ||
+                    'Your data purchase is being processed.',
+                    'warning'
+                );
+
+                return;
+
+            }
+
+
+        } catch (error) {
+
+            showMessage(
+                error.message,
+                'danger'
+            );
+
+        } finally {
+
+            buyButton.disabled = false;
+
+            buyButton.innerHTML = `
+                <i class="fa-solid fa-wifi me-2"></i>
+                Buy Data Bundle
+            `;
+
+        }
+
+    });
+
+
+    /*
+     * Message helper
+     */
+    function showMessage(message, type) {
+
+        const oldAlert =
+            document.getElementById(
+                'dataPurchaseAlert'
+            );
+
+        if (oldAlert) {
+            oldAlert.remove();
+        }
+
+
+        const alert =
+            document.createElement('div');
+
+        alert.id =
+            'dataPurchaseAlert';
+
+        alert.className =
+            `alert alert-${type} mt-3`;
+
+        alert.innerHTML =
+            escapeHtml(message);
+
+
+        form.parentNode.insertBefore(
+            alert,
+            form
+        );
+
+
+        setTimeout(() => {
+
+            alert.remove();
+
+        }, 7000);
+
+    }
+
+
+    /*
+     * Prevent HTML injection when displaying
+     * VTpass plan names.
+     */
+    function escapeHtml(value) {
+
+        const div =
+            document.createElement('div');
+
+        div.textContent =
+            value ?? '';
+
+        return div.innerHTML;
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>

@@ -47,14 +47,11 @@ return [
 
 
     'vtpass' => [
-
-    'url' => env('VTPASS_URL'),
-
-    'username' => env('VTPASS_USERNAME'),
-
-    'password' => env('VTPASS_PASSWORD'),
-
-],
+        'base_url' => env('VTPASS_BASE_URL', 'https://sandbox.vtpass.com/api'),
+        'api_key' => env('VTPASS_API_KEY'),
+        'public_key' => env('VTPASS_PUBLIC_KEY'),
+        'secret_key' => env('VTPASS_SECRET_KEY'),
+    ],
 
 'termii' => [
     'key' => env('tlv_81pbpElcIkLnmNvfU4cbMOmjLeXjiynPyxLHlUv06Nk'),

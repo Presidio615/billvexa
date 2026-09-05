@@ -235,6 +235,43 @@
         transform:translateY(-5px);
     }
 
+    .plan-card.clicked {
+    background: #f6f0ff;
+    border-color: #7c3aed;
+    transform: translateY(-5px);
+}
+
+.provider-card.clicked {
+    background: #f6f0ff;
+    border-color: #7c3aed;
+    transform: translateY(-5px);
+}
+
+#verifyMessage {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#customerBox {
+    animation: fadeIn .25s ease;
+}
+
+#selectedPlanBox {
+    animation: fadeIn .25s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
     /* FORM */
     .form-control,
     .form-select{
@@ -450,7 +487,9 @@
                         Subscribe Cable TV
                     </h4>
 
-                    <form>
+                    <form id="cableTvForm">
+
+                        @csrf
 
                         <!-- PROVIDER -->
                         <div class="mb-4">
@@ -461,29 +500,35 @@
 
                             <div class="row g-3">
 
+                                <!-- DSTV -->
                                 <div class="col-md-4">
 
-                                    <a href="#" class="nav-link">
-                                        <div class="provider-card">
-                                            
-                                            <i class="fa-solid fa-tv fs-2 text-primary mb-2"></i>
+                                    <div
+                                        class="provider-card"
+                                        data-provider="dstv"
+                                    >
 
-                                            <h6 class="fw-bold">
-                                                DStv
-                                            </h6> 
+                                        <i class="fa-solid fa-tv fs-2 text-primary mb-2"></i>
 
-                                        </div>
-                                    </a>
+                                        <h6 class="fw-bold mb-0">
+                                            DStv
+                                        </h6>
+
+                                    </div>
 
                                 </div>
 
+                                <!-- GOTV -->
                                 <div class="col-md-4">
 
-                                    <div class="provider-card">
+                                    <div
+                                        class="provider-card"
+                                        data-provider="gotv"
+                                    >
 
                                         <i class="fa-solid fa-satellite-dish fs-2 text-danger mb-2"></i>
 
-                                        <h6 class="fw-bold">
+                                        <h6 class="fw-bold mb-0">
                                             GOtv
                                         </h6>
 
@@ -491,13 +536,17 @@
 
                                 </div>
 
+                                <!-- STARTIMES -->
                                 <div class="col-md-4">
 
-                                    <div class="provider-card">
+                                    <div
+                                        class="provider-card"
+                                        data-provider="startimes"
+                                    >
 
                                         <i class="fa-solid fa-display fs-2 text-success mb-2"></i>
 
-                                        <h6 class="fw-bold">
+                                        <h6 class="fw-bold mb-0">
                                             Startimes
                                         </h6>
 
@@ -507,7 +556,14 @@
 
                             </div>
 
+                            <input
+                                type="hidden"
+                                id="provider"
+                                name="provider"
+                            >
+
                         </div>
+
 
                         <!-- SMART CARD -->
                         <div class="mb-4">
@@ -516,90 +572,83 @@
                                 Smart Card / IUC Number
                             </label>
 
-                            <input type="text"
-                            class="form-control"
-                            placeholder="Enter smart card number">
+                            <div class="input-group">
+
+                                <input
+                                    type="text"
+                                    id="smart_card"
+                                    name="smart_card"
+                                    class="form-control"
+                                    placeholder="Enter smart card number"
+                                    autocomplete="off"
+                                >
+
+                                <button
+                                    type="button"
+                                    id="verifyCustomerBtn"
+                                    class="btn btn-outline-primary"
+                                >
+                                    Verify
+                                </button>
+
+                            </div>
+
+                            <small
+                                id="verifyMessage"
+                                class="d-block mt-2"
+                            ></small>
 
                         </div>
 
+
                         <!-- CUSTOMER NAME -->
-                        <div class="mb-4">
+                        <div
+                            class="mb-4"
+                            id="customerBox"
+                            style="display:none;"
+                        >
 
                             <label class="form-label fw-semibold">
                                 Customer Name
                             </label>
 
-                            <input type="text"
-                            class="form-control"
-                            placeholder="Customer name"
-                            readonly>
+                            <input
+                                type="text"
+                                id="customer_name"
+                                class="form-control"
+                                readonly
+                            >
+
+                            <div class="mt-2">
+
+                                <small
+                                    class="text-muted"
+                                    id="customerDetails"
+                                ></small>
+
+                            </div>
 
                         </div>
 
-                        <!-- PLAN -->
+
+                        <!-- PLANS -->
                         <div class="mb-4">
 
                             <label class="form-label fw-semibold">
                                 Select Subscription Plan
                             </label>
 
-                            <div class="row g-3">
+                            <div
+                                id="plansContainer"
+                                class="row g-3"
+                            >
 
-                                <div class="col-md-4">
+                                <div class="col-12">
 
-                                    <div class="plan-card">
+                                    <div class="alert alert-light border">
 
-                                        <h6 class="fw-bold">
-                                            Compact
-                                        </h6>
-
-                                        <small class="text-muted">
-                                            30 days access
-                                        </small>
-
-                                        <h5 class="fw-bold mt-3 text-primary">
-                                            ₦9,000
-                                        </h5>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-4">
-
-                                    <div class="plan-card">
-
-                                        <h6 class="fw-bold">
-                                            Premium
-                                        </h6>
-
-                                        <small class="text-muted">
-                                            Full package
-                                        </small>
-
-                                        <h5 class="fw-bold mt-3 text-primary">
-                                            ₦21,000
-                                        </h5>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-4">
-
-                                    <div class="plan-card">
-
-                                        <h6 class="fw-bold">
-                                            Smallie
-                                        </h6>
-
-                                        <small class="text-muted">
-                                            Budget package
-                                        </small>
-
-                                        <h5 class="fw-bold mt-3 text-primary">
-                                            ₦3,500
-                                        </h5>
+                                        Select a provider to load
+                                        available subscription plans.
 
                                     </div>
 
@@ -609,8 +658,84 @@
 
                         </div>
 
+
+                        <!-- SELECTED PLAN -->
+                        <input
+                            type="hidden"
+                            id="variation_code"
+                            name="variation_code"
+                        >
+
+                        <input
+                            type="hidden"
+                            id="variation_name"
+                            name="variation_name"
+                        >
+
+                        <input
+                            type="hidden"
+                            id="amount"
+                            name="amount"
+                        >
+
+
+                        <!-- SELECTED PLAN DISPLAY -->
+                        <div
+                            id="selectedPlanBox"
+                            class="alert alert-primary"
+                            style="display:none;"
+                        >
+
+                            <div class="d-flex justify-content-between">
+
+                                <span>
+                                    Selected Plan
+                                </span>
+
+                                <strong id="selectedPlanName">
+                                </strong>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+
+                                <span>
+                                    Amount
+                                </span>
+
+                                <strong id="selectedPlanAmount">
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- WALLET -->
+                        <div class="alert alert-light border">
+
+                            <div class="d-flex justify-content-between">
+
+                                <span>
+                                    Wallet Balance
+                                </span>
+
+                                <strong>
+                                    ₦{{ number_format(auth()->user()->wallet_balance, 2) }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
                         <!-- BUTTON -->
-                        <button class="subscribe-btn w-100">
+                        <button
+                            type="submit"
+                            id="subscribeBtn"
+                            class="subscribe-btn w-100"
+                            disabled
+                        >
 
                             <i class="fa-solid fa-circle-check me-2"></i>
 
@@ -619,7 +744,6 @@
                         </button>
 
                     </form>
-
                 </div>
 
             </div>
@@ -628,125 +752,95 @@
             <div class="col-lg-4">
 
                 <!-- INFO -->
-                <div class="custom-card mb-4">
-
-                    <h5 class="fw-bold mb-4">
-                        Subscription Info
-                    </h5>
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span class="text-muted">
-                            Minimum Plan
-                        </span>
-
-                        <strong>
-                            ₦1,000
-                        </strong>
-
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span class="text-muted">
-                            Activation Time
-                        </span>
-
-                        <strong>
-                            Instant
-                        </strong>
-
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-
-                        <span class="text-muted">
-                            Service Charge
-                        </span>
-
-                        <strong>
-                            Free
-                        </strong>
-
-                    </div>
-
-                </div>
-
-                <!-- RECENT -->
                 <div class="custom-card">
 
                     <div class="d-flex justify-content-between mb-4">
 
-                        <h5 class="fw-bold">
+                        <h5 class="fw-bold mb-0">
                             Recent Subscriptions
                         </h5>
 
-                        <a href={{ route('history') }}
-                        class="text-decoration-none">
+                        <a
+                            href="{{ route('history') }}"
+                            class="text-decoration-none"
+                        >
                             View all
                         </a>
 
                     </div>
 
-                    <div class="transaction-item d-flex justify-content-between">
 
-                        <div>
+                    @forelse($transactions as $transaction)
 
-                            <h6 class="mb-1">
-                                DStv Compact
-                            </h6>
+                        <div class="transaction-item d-flex justify-content-between">
 
-                            <small class="text-muted">
-                                Today • 10:20 AM
-                            </small>
+                            <div>
+
+                                <h6 class="mb-1">
+
+                                    {{ $transaction->variation_name
+                                        ?? strtoupper($transaction->provider) }}
+
+                                </h6>
+
+                                <small class="text-muted">
+
+                                    {{ strtoupper($transaction->provider) }}
+
+                                    •
+                                    
+                                    {{ $transaction->smart_card }}
+
+                                    <br>
+
+                                    {{ $transaction->created_at->format('d M Y • h:i A') }}
+
+                                </small>
+
+                            </div>
+
+
+                            <div class="text-end">
+
+                                <strong
+                                    class="
+                                    {{ $transaction->status === 'delivered'
+                                        ? 'text-success'
+                                        : ($transaction->status === 'refunded'
+                                            ? 'text-danger'
+                                            : 'text-warning') }}
+                                    "
+                                >
+
+                                    ₦{{ number_format($transaction->amount, 2) }}
+
+                                </strong>
+
+                                <br>
+
+                                <small>
+
+                                    {{ ucfirst($transaction->status) }}
+
+                                </small>
+
+                            </div>
 
                         </div>
 
-                        <strong class="text-success">
-                            ₦9,000
-                        </strong>
+                    @empty
 
-                    </div>
+                        <div class="text-center py-4">
 
-                    <div class="transaction-item d-flex justify-content-between">
+                            <i class="fa-solid fa-tv fs-1 text-muted mb-3"></i>
 
-                        <div>
-
-                            <h6 class="mb-1">
-                                GOtv Max
-                            </h6>
-
-                            <small class="text-muted">
-                                Yesterday • 8:00 PM
-                            </small>
+                            <p class="text-muted mb-0">
+                                No cable TV subscriptions yet.
+                            </p>
 
                         </div>
 
-                        <strong class="text-success">
-                            ₦6,200
-                        </strong>
-
-                    </div>
-
-                    <div class="transaction-item d-flex justify-content-between">
-
-                        <div>
-
-                            <h6 class="mb-1">
-                                Startimes Nova
-                            </h6>
-
-                            <small class="text-muted">
-                                29 May • 6:15 AM
-                            </small>
-
-                        </div>
-
-                        <strong class="text-success">
-                            ₦2,500
-                        </strong>
-
-                    </div>
+                    @endforelse
 
                 </div>
 
@@ -787,21 +881,873 @@
 
 
     <script>
-        const cards = document.querySelectorAll('.provider-card');
 
-        cards.forEach(card => {
-            card.addEventListener('click', () => {
-                const isSelected = card.classList.contains('clicked');
+document.addEventListener('DOMContentLoaded', function () {
 
-                cards.forEach(c=> c.classList.remove('clicked'));
+    const providerCards =
+        document.querySelectorAll('.provider-card');
 
-                if (!isSelected){
-                    card.classList.add('clicked');
-                }
+    const providerInput =
+        document.getElementById('provider');
+
+    const smartCardInput =
+        document.getElementById('smart_card');
+
+    const verifyBtn =
+        document.getElementById('verifyCustomerBtn');
+
+    const verifyMessage =
+        document.getElementById('verifyMessage');
+
+    const customerBox =
+        document.getElementById('customerBox');
+
+    const customerName =
+        document.getElementById('customer_name');
+
+    const customerDetails =
+        document.getElementById('customerDetails');
+
+    const plansContainer =
+        document.getElementById('plansContainer');
+
+    const variationCode =
+        document.getElementById('variation_code');
+
+    const variationName =
+        document.getElementById('variation_name');
+
+    const amountInput =
+        document.getElementById('amount');
+
+    const selectedPlanBox =
+        document.getElementById('selectedPlanBox');
+
+    const selectedPlanName =
+        document.getElementById('selectedPlanName');
+
+    const selectedPlanAmount =
+        document.getElementById('selectedPlanAmount');
+
+    const subscribeBtn =
+        document.getElementById('subscribeBtn');
+
+    const form =
+        document.getElementById('cableTvForm');
+
+
+    let selectedProvider = null;
+
+    let customerVerified = false;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROVIDER SELECTION
+    |--------------------------------------------------------------------------
+    */
+
+    providerCards.forEach(card => {
+
+        card.addEventListener('click', function () {
+
+            providerCards.forEach(item => {
+                item.classList.remove('clicked');
             });
-        });
-    </script>
 
+            this.classList.add('clicked');
+
+            selectedProvider =
+                this.dataset.provider;
+
+            providerInput.value =
+                selectedProvider;
+
+            /*
+             * Reset customer.
+             */
+            customerVerified = false;
+
+            customerBox.style.display =
+                'none';
+
+            customerName.value = '';
+
+            customerDetails.textContent = '';
+
+            variationCode.value = '';
+
+            variationName.value = '';
+
+            amountInput.value = '';
+
+            selectedPlanBox.style.display =
+                'none';
+
+            subscribeBtn.disabled = true;
+
+            /*
+             * Load plans.
+             */
+            loadPlans(selectedProvider);
+
+        });
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOAD PLANS
+    |--------------------------------------------------------------------------
+    */
+
+    async function loadPlans(provider) {
+
+plansContainer.innerHTML = `
+    <div class="col-12 text-center py-4">
+        <div
+            class="spinner-border text-primary"
+            role="status"
+        ></div>
+
+        <p class="text-muted mt-2">
+            Loading plans...
+        </p>
+    </div>
+`;
+
+try {
+
+    const response = await fetch(
+        `{{ route('cable.tv.plans') }}?provider=${encodeURIComponent(provider)}`,
+        {
+            method: 'GET',
+
+            headers: {
+                'Accept': 'application/json'
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+        throw new Error(
+            data.message || 'Unable to load plans.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET PLANS
+    |--------------------------------------------------------------------------
+    |
+    | Laravel may return the plans directly as an array,
+    | or VTpass may return them inside content.variations.
+    |
+    */
+
+    let plans = [];
+
+    if (Array.isArray(data.plans)) {
+
+        plans = data.plans;
+
+    } else if (
+        data.plans &&
+        Array.isArray(data.plans.content?.variations)
+    ) {
+
+        plans = data.plans.content.variations;
+
+    } else if (
+        data.plans &&
+        Array.isArray(data.plans.variations)
+    ) {
+
+        plans = data.plans.variations;
+
+    } else if (
+        Array.isArray(data.content?.variations)
+    ) {
+
+        plans = data.content.variations;
+    }
+
+    renderPlans(plans);
+
+} catch (error) {
+
+    console.error('Cable TV plans error:', error);
+
+    plansContainer.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-danger">
+                ${escapeHtml(error.message)}
+            </div>
+        </div>
+    `;
+}
+}
+
+    /*
+    |--------------------------------------------------------------------------
+    | DISPLAY PLANS
+    |--------------------------------------------------------------------------
+    */
+    function renderPlans(plans) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | MAKE SURE PLANS IS AN ARRAY
+    |--------------------------------------------------------------------------
+    */
+
+    if (!Array.isArray(plans)) {
+
+        console.error('Invalid plans received:', plans);
+
+        plansContainer.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    Unable to load subscription plans.
+                    Invalid plan data was returned.
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | NO PLANS
+    |--------------------------------------------------------------------------
+    */
+
+    if (plans.length === 0) {
+
+        plansContainer.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    No plans are currently available.
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DISPLAY PLANS
+    |--------------------------------------------------------------------------
+    */
+
+    plansContainer.innerHTML = plans.map(plan => {
+
+        const code =
+            plan.variation_code || '';
+
+        const name =
+            plan.name ||
+            plan.variation_name ||
+            'Subscription Plan';
+
+        const price =
+            parseFloat(
+                plan.variation_amount || 0
+            );
+
+        return `
+            <div class="col-md-4">
+
+                <div
+                    class="plan-card"
+                    data-code="${escapeHtml(code)}"
+                    data-name="${escapeHtml(name)}"
+                    data-amount="${price}"
+                >
+
+                    <h6 class="fw-bold">
+                        ${escapeHtml(name)}
+                    </h6>
+
+                    <small class="text-muted">
+                        Cable TV Subscription
+                    </small>
+
+                    <h5 class="fw-bold mt-3 text-primary">
+                        ₦${price.toLocaleString(
+                            'en-NG',
+                            {
+                                minimumFractionDigits: 2
+                            }
+                        )}
+                    </h5>
+
+                </div>
+
+            </div>
+        `;
+
+    }).join('');
+
+    /*
+    |--------------------------------------------------------------------------
+    | PLAN CLICK EVENTS
+    |--------------------------------------------------------------------------
+    */
+
+    document
+        .querySelectorAll('.plan-card')
+        .forEach(card => {
+
+            card.addEventListener(
+                'click',
+                function () {
+
+                    document
+                        .querySelectorAll('.plan-card')
+                        .forEach(item => {
+                            item.classList.remove(
+                                'clicked'
+                            );
+                        });
+
+                    this.classList.add(
+                        'clicked'
+                    );
+
+                    const code =
+                        this.dataset.code;
+
+                    const name =
+                        this.dataset.name;
+
+                    const amount =
+                        parseFloat(
+                            this.dataset.amount
+                        );
+
+                    variationCode.value =
+                        code;
+
+                    variationName.value =
+                        name;
+
+                    amountInput.value =
+                        amount;
+
+                    selectedPlanName.textContent =
+                        name;
+
+                    selectedPlanAmount.textContent =
+                        '₦' +
+                        amount.toLocaleString(
+                            'en-NG',
+                            {
+                                minimumFractionDigits: 2
+                            }
+                        );
+
+                    selectedPlanBox.style.display =
+                        'block';
+
+                    updateSubscribeButton();
+                }
+            );
+
+        });
+}
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFY CUSTOMER
+    |--------------------------------------------------------------------------
+    */
+
+    verifyBtn.addEventListener(
+        'click',
+        verifyCustomer
+    );
+
+
+    async function verifyCustomer() {
+
+        const provider =
+            providerInput.value;
+
+        const smartCard =
+            smartCardInput.value.trim();
+
+
+        if (!provider) {
+
+            showVerifyMessage(
+                'Please select a TV provider.',
+                'danger'
+            );
+
+            return;
+        }
+
+
+        if (!smartCard) {
+
+            showVerifyMessage(
+                'Enter your Smart Card / IUC number.',
+                'danger'
+            );
+
+            return;
+        }
+
+
+        verifyBtn.disabled = true;
+
+        verifyBtn.innerHTML = `
+
+            <span
+                class="spinner-border spinner-border-sm"
+            ></span>
+
+            Verifying...
+
+        `;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    '{{ route('cable.tv.verify') }}',
+                    {
+
+                        method: 'POST',
+
+                        headers: {
+
+                            'Content-Type':
+                                'application/json',
+
+                            'Accept':
+                                'application/json',
+
+                            'X-CSRF-TOKEN':
+                                document
+                                .querySelector(
+                                    'input[name="_token"]'
+                                )
+                                .value
+
+                        },
+
+                        body: JSON.stringify({
+
+                            provider:
+                                provider,
+
+                            smart_card:
+                                smartCard
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message
+                    || 'Unable to verify customer.'
+                );
+
+            }
+
+
+            customerVerified = true;
+
+
+            const customer =
+                data.customer;
+
+
+            customerName.value =
+                customer.name
+                || 'Customer verified';
+
+
+            customerBox.style.display =
+                'block';
+
+
+            let details = '';
+
+
+            if (customer.status) {
+
+                details +=
+                    `Status: ${customer.status}`;
+
+            }
+
+
+            if (customer.current_bouquet) {
+
+                details +=
+                    ` • Current package: ${customer.current_bouquet}`;
+
+            }
+
+
+            if (customer.due_date) {
+
+                details +=
+                    ` • Due: ${customer.due_date}`;
+
+            }
+
+
+            customerDetails.textContent =
+                details;
+
+
+            showVerifyMessage(
+                'Customer verified successfully.',
+                'success'
+            );
+
+
+            updateSubscribeButton();
+
+
+        } catch (error) {
+
+            customerVerified = false;
+
+            customerBox.style.display =
+                'none';
+
+            showVerifyMessage(
+                error.message,
+                'danger'
+            );
+
+            updateSubscribeButton();
+
+        } finally {
+
+            verifyBtn.disabled = false;
+
+            verifyBtn.textContent =
+                'Verify';
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUBSCRIBE
+    |--------------------------------------------------------------------------
+    */
+
+    form.addEventListener(
+        'submit',
+        async function (event) {
+
+            event.preventDefault();
+
+
+            if (!customerVerified) {
+
+                alert(
+                    'Please verify your Smart Card number first.'
+                );
+
+                return;
+
+            }
+
+
+            if (!variationCode.value) {
+
+                alert(
+                    'Please select a subscription plan.'
+                );
+
+                return;
+
+            }
+
+
+            const amount =
+                parseFloat(
+                    amountInput.value
+                );
+
+
+            if (!amount || amount <= 0) {
+
+                alert(
+                    'Invalid subscription amount.'
+                );
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    `Subscribe ${customerName.value} for ₦${amount.toLocaleString('en-NG', {
+                        minimumFractionDigits: 2
+                    })}?`
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            subscribeBtn.disabled =
+                true;
+
+
+            subscribeBtn.innerHTML = `
+
+                <span
+                    class="spinner-border spinner-border-sm me-2"
+                ></span>
+
+                Processing...
+
+            `;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '{{ route('cable.tv.purchase') }}',
+                        {
+
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type':
+                                    'application/json',
+
+                                'Accept':
+                                    'application/json',
+
+                                'X-CSRF-TOKEN':
+                                    document
+                                    .querySelector(
+                                        'input[name="_token"]'
+                                    )
+                                    .value
+
+                            },
+
+                            body: JSON.stringify({
+
+                                provider:
+                                    providerInput.value,
+
+                                smart_card:
+                                    smartCardInput.value.trim(),
+
+                                variation_code:
+                                    variationCode.value,
+
+                                variation_name:
+                                    variationName.value,
+
+                                amount:
+                                    amountInput.value
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok || !data.success) {
+
+                    throw new Error(
+                        data.message
+                        || 'Transaction failed.'
+                    );
+
+                }
+
+
+                if (
+                    data.status ===
+                    'pending'
+                ) {
+
+                    alert(
+                        data.message
+                        + '\nReference: '
+                        + (
+                            data.reference
+                            || ''
+                        )
+                    );
+
+                    window.location.reload();
+
+                    return;
+
+                }
+
+
+                alert(
+                    'Cable TV subscription successful!'
+                    + '\n\n'
+                    + 'Customer: '
+                    + (
+                        customerName.value
+                        || ''
+                    )
+                    + '\n'
+                    + 'Plan: '
+                    + (
+                        data.transaction?.plan
+                        || ''
+                    )
+                    + '\n'
+                    + 'Amount: ₦'
+                    + (
+                        data.transaction?.amount
+                        || ''
+                    )
+                    + '\n'
+                    + 'Reference: '
+                    + (
+                        data.transaction?.reference
+                        || ''
+                    )
+                );
+
+
+                window.location.reload();
+
+
+            } catch (error) {
+
+                alert(
+                    error.message
+                );
+
+
+                subscribeBtn.disabled =
+                    false;
+
+                subscribeBtn.innerHTML = `
+
+                    <i
+                        class="fa-solid fa-circle-check me-2"
+                    ></i>
+
+                    Subscribe Now
+
+                `;
+
+            }
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | BUTTON STATE
+    |--------------------------------------------------------------------------
+    */
+
+    function updateSubscribeButton() {
+
+        subscribeBtn.disabled =
+            !customerVerified
+            ||
+            !variationCode.value;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFY MESSAGE
+    |--------------------------------------------------------------------------
+    */
+
+    function showVerifyMessage(
+        message,
+        type
+    ) {
+
+        verifyMessage.className =
+            `d-block mt-2 text-${type}`;
+
+        verifyMessage.textContent =
+            message;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | HTML ESCAPE
+    |--------------------------------------------------------------------------
+    */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(
+                /&/g,
+                '&amp;'
+            )
+            .replace(
+                /</g,
+                '&lt;'
+            )
+            .replace(
+                />/g,
+                '&gt;'
+            )
+            .replace(
+                /"/g,
+                '&quot;'
+            )
+            .replace(
+                /'/g,
+                '&#039;'
+            );
+
+    }
+
+});
+
+</script>
 
 
 </body>
