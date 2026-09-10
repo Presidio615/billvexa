@@ -371,12 +371,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/education/transactions', [EducationController::class, 'transactions'])
         ->name('dashboard.education.transactions');
 
-
-
-    Route::get('/quick/transport', function () {
-        return view('BillVexa.Dashboard.Quick.transport');
-    })->name('transport');
-
     Route::get('/quick/sports', function () {
         return view('BillVexa.Dashboard.Quick.sport');
     })->name('sports');

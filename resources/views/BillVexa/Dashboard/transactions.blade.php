@@ -532,7 +532,7 @@ svg{
 
                             <strong>
 
-                                ₦₦{{ number_format($transaction->total,2) }}
+                                ₦{{ number_format($transaction->total,2) }}
 
                             </strong>
 
@@ -675,7 +675,7 @@ svg{
 
                             <strong>
 
-                                ₦{{ number_format($transaction->amount,2) }}
+                                ₦{{ number_format($transaction->total,2) }}
 
                             </strong>
 

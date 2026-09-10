@@ -679,6 +679,7 @@ public function educationPurchase(
     return $response->json();
 }
 
+
     /*
     |--------------------------------------------------------------------------
     | REQUERY

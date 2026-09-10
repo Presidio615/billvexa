@@ -47,7 +47,7 @@ return [
 
 
     'vtpass' => [
-        'base_url' => env('VTPASS_BASE_URL', 'https://sandbox.vtpass.com/api'),
+        'base_url' => env('VTPASS_BASE_URL'),
         'api_key' => env('VTPASS_API_KEY'),
         'public_key' => env('VTPASS_PUBLIC_KEY'),
         'secret_key' => env('VTPASS_SECRET_KEY'),

@@ -136,5 +136,7 @@ public function electricityTransactions()
         \App\Models\ElectricityTransaction::class
     );
 }
+
+
     
 }

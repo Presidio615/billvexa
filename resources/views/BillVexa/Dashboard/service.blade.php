@@ -392,16 +392,6 @@
                     </a>
                 </div>
 
-                <!-- Transport -->
-                <div class="col-4 col-md-3 col-lg-2">
-                    <a href="{{ route('transport') }}" class="service-item text-center">
-                        <div class="icon-box purple">
-                            <i class="bi bi-bus-front-fill"></i>
-                        </div>
-                        <div class="service-name">Transport</div>
-                    </a>
-                </div>
-
                 <!-- Sport -->
                 <div class="col-4 col-md-3 col-lg-2">
                     <a href="{{ route('sports') }}" class="service-item text-center">

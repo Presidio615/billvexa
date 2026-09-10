@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AirtimeTransaction;
+use App\Models\Transaction;
 use App\Services\VtpassService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -178,6 +179,30 @@ class AirtimeController extends Controller
                         now(),
                 ]);
 
+                Transaction::create([
+                    'user_id' => $transaction->user_id,
+
+                    'type' => 'debit',
+
+                    'service' => 'Airtime',
+
+                    'network' => $transaction->network,
+
+                    'phone' => $transaction->phone,
+
+                    'amount' => $transaction->amount,
+
+                    'discount' => $transaction->discount,
+
+                    'profit' => 0,
+
+                    'total' => $transaction->total,
+
+                    'status' => 'successful',
+
+                    'reference' => 'AIR-' . $transaction->request_id,
+                ]);
+
                 return back()->with(
                     'success',
                     'Airtime purchased successfully.'
@@ -207,6 +232,20 @@ class AirtimeController extends Controller
                         $response,
                 ]);
 
+                Transaction::create([
+                    'user_id' => $transaction->user_id,
+                    'type' => 'debit',
+                    'service' => 'Airtime',
+                    'network' => $transaction->network,
+                    'phone' => $transaction->phone,
+                    'amount' => $transaction->amount,
+                    'discount' => $transaction->discount,
+                    'total' => $transaction->total,
+                    'profit' => 0,
+                    'reference' => 'AIR-' . $transaction->request_id,
+                    'status' => 'pending',
+                ]);
+
                 return back()->with(
                     'success',
                     'Airtime purchase is processing. Please check your transaction history.'
@@ -229,6 +268,19 @@ class AirtimeController extends Controller
                     $response,
             ]);
 
+            Transaction::create([
+                'user_id' => $transaction->user_id,
+                'type' => 'debit',
+                'service' => 'Airtime',
+                'network' => $transaction->network,
+                'phone' => $transaction->phone,
+                'amount' => $transaction->amount,
+                'discount' => $transaction->discount,
+                'total' => $transaction->total,
+                'profit' => 0,
+                'reference' => 'AIR-' . $transaction->request_id,
+                'status' => 'failed',
+            ]);
             $this->refund(
                 $transaction->user_id,
                 $transaction->total
@@ -236,7 +288,7 @@ class AirtimeController extends Controller
 
             return back()->with(
                 'error',
-                'Airtime purchase failed. Your wallet has been refunded.'
+                'Airtime failed: ' . $message . ' | Status: ' . ($status ?? 'unknown') . ' | Code: ' . ($response['code'] ?? 'unknown')
             );
 
         } catch (Throwable $e) {
@@ -245,6 +297,13 @@ class AirtimeController extends Controller
              * Do not automatically refund when the
              * VTpass result is unknown.
              */
+
+            \Log::error('Airtime Purchase Error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             if (isset($transaction)) {
 
@@ -258,7 +317,7 @@ class AirtimeController extends Controller
 
             return back()->with(
                 'error',
-                'Airtime purchase could not be confirmed. Please check your transaction history before trying again.'
+                'Airtime Error: ' . $e->getMessage()
             );
         }
     }
