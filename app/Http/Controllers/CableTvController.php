@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CableTvTransaction;
+use App\Models\Transaction;
 use App\Services\VtpassService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,17 +34,17 @@ class CableTvController extends Controller
             ->take(5)
             ->get();
 
-        return view('BillVexa.Dashboard.Quick.cable', compact(
-            'transactions'
-        ));
+        return view(
+            'BillVexa.Dashboard.Quick.cable',
+            compact('transactions')
+        );
     }
 
     /**
      * Get plans for selected provider.
      */
-    public function plans(
-        Request $request
-    ): JsonResponse {
+    public function plans(Request $request): JsonResponse
+    {
         $request->validate([
             'provider' => [
                 'required',
@@ -52,6 +53,7 @@ class CableTvController extends Controller
         ]);
 
         try {
+
             $plans = $this->vtpass->variations(
                 $request->provider
             );
@@ -60,6 +62,7 @@ class CableTvController extends Controller
                 'success' => true,
                 'plans' => $plans,
             ]);
+
         } catch (Throwable $e) {
 
             Log::error(
@@ -79,9 +82,8 @@ class CableTvController extends Controller
     /**
      * Verify smart card/IUC.
      */
-    public function verify(
-        Request $request
-    ): JsonResponse {
+    public function verify(Request $request): JsonResponse
+    {
         $validated = $request->validate([
             'provider' => [
                 'required',
@@ -97,6 +99,7 @@ class CableTvController extends Controller
         ]);
 
         try {
+
             $customer = $this->vtpass->verify(
                 $validated['provider'],
                 $validated['smart_card']
@@ -134,6 +137,7 @@ class CableTvController extends Controller
 
                 'raw' => $customer,
             ]);
+
         } catch (Throwable $e) {
 
             Log::warning(
@@ -160,9 +164,8 @@ class CableTvController extends Controller
     /**
      * Purchase cable TV subscription.
      */
-    public function purchase(
-        Request $request
-    ): JsonResponse {
+    public function purchase(Request $request): JsonResponse
+    {
         $validated = $request->validate([
             'provider' => [
                 'required',
@@ -203,53 +206,24 @@ class CableTvController extends Controller
         );
 
         /*
-         * Generate a unique VTpass request ID.
+         * Generate unique VTpass request ID.
          */
         $requestId = $this->vtpass->generateRequestId()
-            .strtoupper(Str::random(8));
+            . strtoupper(Str::random(8));
 
+        /*
+         * Create the service transaction and
+         * general transaction ONLY after the
+         * wallet has been successfully debited.
+         */
         try {
 
-            /*
-             * STEP 1
-             *
-             * Create local transaction as pending.
-             */
-            $transaction = CableTvTransaction::create([
-                'user_id' => $user->id,
-
-                'request_id' => $requestId,
-
-                'provider' =>
-                    $validated['provider'],
-
-                'service_id' =>
-                    $validated['provider'],
-
-                'variation_code' =>
-                    $validated['variation_code'],
-
-                'variation_name' =>
-                    $validated['variation_name']
-                    ?? null,
-
-                'smart_card' =>
-                    $validated['smart_card'],
-
-                'amount' => $amount,
-
-                'status' => 'pending',
-            ]);
-
-            /*
-             * STEP 2
-             *
-             * Deduct wallet atomically.
-             */
-            $debited = DB::transaction(
+            $transaction = DB::transaction(
                 function () use (
                     $user,
-                    $amount
+                    $validated,
+                    $amount,
+                    $requestId
                 ) {
 
                     $lockedUser = $user
@@ -259,52 +233,131 @@ class CableTvController extends Controller
                         ->first();
 
                     if (!$lockedUser) {
-                        return false;
+                        throw new \RuntimeException(
+                            'User account not found.'
+                        );
                     }
 
                     $balance = (float)
                         $lockedUser->wallet_balance;
 
                     if ($balance < $amount) {
-                        return false;
+                        throw new \RuntimeException(
+                            'Insufficient wallet balance.'
+                        );
                     }
 
+                    /*
+                     * Deduct wallet.
+                     */
                     $lockedUser->wallet_balance =
                         $balance - $amount;
 
                     $lockedUser->save();
 
-                    return true;
+                    /*
+                     * Create Cable TV transaction.
+                     */
+                    $cableTransaction =
+                        CableTvTransaction::create([
+                            'user_id' =>
+                                $lockedUser->id,
+
+                            'request_id' =>
+                                $requestId,
+
+                            'provider' =>
+                                $validated['provider'],
+
+                            'service_id' =>
+                                $validated['provider'],
+
+                            'variation_code' =>
+                                $validated['variation_code'],
+
+                            'variation_name' =>
+                                $validated['variation_name']
+                                ?? null,
+
+                            'smart_card' =>
+                                $validated['smart_card'],
+
+                            'amount' =>
+                                $amount,
+
+                            'status' =>
+                                'pending',
+                        ]);
+
+                    /*
+                     * Create GENERAL transaction.
+                     *
+                     * This record appears in:
+                     *
+                     * User Transaction History
+                     * Admin Transaction Management
+                     */
+                    Transaction::create([
+                        'user_id' =>
+                            $lockedUser->id,
+
+                        'type' =>
+                            'debit',
+
+                        'service' =>
+                            'Cable TV',
+
+                        'network' =>
+                            strtoupper(
+                                $validated['provider']
+                            ),
+
+                        'phone' =>
+                            $lockedUser->phone
+                            ?? $lockedUser->phone_number
+                            ?? null,
+
+                        'amount' =>
+                            $amount,
+
+                        'status' =>
+                            'pending',
+
+                        'reference' =>
+                            $requestId,
+
+                        'discount' =>
+                            0,
+
+                        'profit' =>
+                            0,
+
+                        'total' =>
+                            $amount,
+                    ]);
+
+                    return $cableTransaction;
                 }
             );
 
-            /*
-             * Wallet has insufficient funds.
-             */
-            if (!$debited) {
+        } catch (\RuntimeException $e) {
 
-                $transaction->update([
-                    'status' => 'failed',
+            return response()->json([
+                'success' => false,
 
-                    'response_message' =>
-                        'Insufficient wallet balance.',
-                ]);
+                'message' =>
+                    $e->getMessage(),
+            ], 422);
+        }
 
-                return response()->json([
-                    'success' => false,
+        /*
+         * Send purchase request to VTpass.
+         */
+        try {
 
-                    'message' =>
-                        'Insufficient wallet balance.',
-                ], 422);
-            }
-
-            /*
-             * STEP 3
-             *
-             * Purchase from VTpass.
-             */
             $payload = [
-                'request_id' => $requestId,
+                'request_id' =>
+                    $requestId,
 
                 'serviceID' =>
                     $validated['provider'],
@@ -315,49 +368,74 @@ class CableTvController extends Controller
                 'variation_code' =>
                     $validated['variation_code'],
 
-                'amount' => $amount,
+                'amount' =>
+                    $amount,
 
                 'phone' =>
                     $user->phone
                     ?? $user->phone_number
                     ?? '08000000000',
 
-                'subscription_type' => 'change',
+                'subscription_type' =>
+                    'change',
             ];
 
-            $response = $this->vtpass->purchase(
-                $payload
-            );
+            $response =
+                $this->vtpass->purchase($payload);
 
             /*
-             * Save complete API response.
+             * Get VTpass transaction.
+             */
+            $vtpassTransaction =
+                $response['content']['transactions']
+                ?? [];
+
+            $transactionId =
+                $vtpassTransaction['transactionId']
+                ?? null;
+
+            $status =
+                strtolower(
+                    $vtpassTransaction['status']
+                    ?? ''
+                );
+
+            /*
+             * Update service transaction
+             * with VTpass response.
              */
             $transaction->update([
-                'api_response' => $response,
+                'api_response' =>
+                    $response,
 
                 'vtpass_transaction_id' =>
-                    data_get(
-                        $response,
-                        'content.transactions.transactionId'
-                    ),
+                    $transactionId,
             ]);
 
             /*
-             * VTpass SUCCESS.
+             * Find GENERAL transaction.
+             *
+             * IMPORTANT:
+             * We update the existing record.
+             *
+             * We DO NOT create another one.
              */
-            $code = $response['code']
-                ?? null;
-
-            $status = strtolower(
-                data_get(
-                    $response,
-                    'content.transactions.status',
-                    ''
+            $generalTransaction =
+                Transaction::where(
+                    'reference',
+                    $requestId
                 )
-            );
+                    ->where(
+                        'user_id',
+                        $user->id
+                    )
+                    ->first();
 
+            /*
+             * SUCCESS
+             */
             if (
-                $code === '000'
+                ($response['code'] ?? null) === '000'
                 &&
                 in_array(
                     $status,
@@ -376,7 +454,8 @@ class CableTvController extends Controller
                     );
 
                 $transaction->update([
-                    'status' => 'delivered',
+                    'status' =>
+                        'delivered',
 
                     'customer_name' =>
                         $customerName,
@@ -387,13 +466,27 @@ class CableTvController extends Controller
                         ]
                         ?? 'Cable TV subscription successful.',
 
-                    'purchased_at' => now(),
+                    'purchased_at' =>
+                        now(),
                 ]);
 
-                return response()->json([
-                    'success' => true,
+                /*
+                 * Update GENERAL transaction.
+                 */
+                if ($generalTransaction) {
 
-                    'status' => 'delivered',
+                    $generalTransaction->update([
+                        'status' =>
+                            'successful',
+                    ]);
+                }
+
+                return response()->json([
+                    'success' =>
+                        true,
+
+                    'status' =>
+                        'delivered',
 
                     'message' =>
                         'Cable TV subscription successful.',
@@ -427,7 +520,7 @@ class CableTvController extends Controller
             }
 
             /*
-             * VTpass can return a pending state.
+             * PENDING
              */
             if (
                 in_array(
@@ -441,7 +534,8 @@ class CableTvController extends Controller
             ) {
 
                 $transaction->update([
-                    'status' => 'pending',
+                    'status' =>
+                        'pending',
 
                     'response_message' =>
                         $response[
@@ -450,10 +544,23 @@ class CableTvController extends Controller
                         ?? 'Transaction is processing.',
                 ]);
 
-                return response()->json([
-                    'success' => true,
+                /*
+                 * Keep GENERAL transaction pending.
+                 */
+                if ($generalTransaction) {
 
-                    'status' => 'pending',
+                    $generalTransaction->update([
+                        'status' =>
+                            'pending',
+                    ]);
+                }
+
+                return response()->json([
+                    'success' =>
+                        true,
+
+                    'status' =>
+                        'pending',
 
                     'message' =>
                         'Your cable TV transaction is being processed.',
@@ -464,7 +571,7 @@ class CableTvController extends Controller
             }
 
             /*
-             * VTpass failed.
+             * FAILED
              *
              * Refund wallet.
              */
@@ -474,7 +581,8 @@ class CableTvController extends Controller
             );
 
             $transaction->update([
-                'status' => 'refunded',
+                'status' =>
+                    'refunded',
 
                 'response_message' =>
                     $response[
@@ -483,10 +591,25 @@ class CableTvController extends Controller
                     ?? 'Cable TV transaction failed.',
             ]);
 
-            return response()->json([
-                'success' => false,
+            /*
+             * General transaction becomes
+             * REFUNDED because the wallet
+             * has actually been refunded.
+             */
+            if ($generalTransaction) {
 
-                'status' => 'refunded',
+                $generalTransaction->update([
+                    'status' =>
+                        'refunded',
+                ]);
+            }
+
+            return response()->json([
+                'success' =>
+                    false,
+
+                'status' =>
+                    'refunded',
 
                 'message' =>
                     $response[
@@ -515,52 +638,232 @@ class CableTvController extends Controller
             );
 
             /*
-             * Refund if money was already deducted.
+             * Try VTpass requery before refunding.
              */
             try {
 
-                if (
-                    isset($transaction)
-                    &&
-                    $transaction->status === 'pending'
-                ) {
-
-                    $this->refundWallet(
-                        $user->id,
-                        $amount
+                $requery =
+                    $this->vtpass->requery(
+                        $requestId
                     );
 
+                $requeryStatus =
+                    strtolower(
+                        data_get(
+                            $requery,
+                            'content.transactions.status',
+                            ''
+                        )
+                    );
+
+                $generalTransaction =
+                    Transaction::where(
+                        'reference',
+                        $requestId
+                    )
+                        ->where(
+                            'user_id',
+                            $user->id
+                        )
+                        ->first();
+
+                /*
+                 * VTpass delivered.
+                 */
+                if (
+                    in_array(
+                        $requeryStatus,
+                        [
+                            'delivered',
+                            'successful',
+                        ],
+                        true
+                    )
+                ) {
+
                     $transaction->update([
-                        'status' => 'refunded',
+                        'status' =>
+                            'delivered',
+
+                        'api_response' =>
+                            $requery,
+
+                        'vtpass_transaction_id' =>
+                            data_get(
+                                $requery,
+                                'content.transactions.transactionId'
+                            ),
+
+                        'purchased_at' =>
+                            now(),
 
                         'response_message' =>
-                            'Transaction failed. Wallet refunded.',
+                            'Cable TV subscription successful.',
+                    ]);
+
+                    if ($generalTransaction) {
+
+                        $generalTransaction->update([
+                            'status' =>
+                                'successful',
+                        ]);
+                    }
+
+                    return response()->json([
+                        'success' =>
+                            true,
+
+                        'status' =>
+                            'delivered',
+
+                        'message' =>
+                            'Cable TV subscription successful.',
                     ]);
                 }
 
-            } catch (Throwable $refundException) {
+                /*
+                 * Still pending.
+                 */
+                if (
+                    in_array(
+                        $requeryStatus,
+                        [
+                            'pending',
+                            'processing',
+                        ],
+                        true
+                    )
+                ) {
 
-                Log::critical(
-                    'Cable TV wallet refund failed',
+                    $transaction->update([
+                        'status' =>
+                            'pending',
+
+                        'api_response' =>
+                            $requery,
+
+                        'response_message' =>
+                            'Transaction is still being processed.',
+                    ]);
+
+                    if ($generalTransaction) {
+
+                        $generalTransaction->update([
+                            'status' =>
+                                'pending',
+                        ]);
+                    }
+
+                    return response()->json([
+                        'success' =>
+                            true,
+
+                        'status' =>
+                            'pending',
+
+                        'message' =>
+                            'Your cable TV transaction is still being processed.',
+                    ], 202);
+                }
+
+                /*
+                 * VTpass confirmed failure.
+                 *
+                 * Refund wallet.
+                 */
+                $this->refundWallet(
+                    $user->id,
+                    $amount
+                );
+
+                $transaction->update([
+                    'status' =>
+                        'refunded',
+
+                    'api_response' =>
+                        $requery,
+
+                    'response_message' =>
+                        'Transaction failed. Wallet refunded.',
+                ]);
+
+                if ($generalTransaction) {
+
+                    $generalTransaction->update([
+                        'status' =>
+                            'refunded',
+                    ]);
+                }
+
+                return response()->json([
+                    'success' =>
+                        false,
+
+                    'status' =>
+                        'refunded',
+
+                    'message' =>
+                        'Cable TV transaction failed. Your wallet has been refunded.',
+                ], 422);
+
+            } catch (Throwable $requeryException) {
+
+                /*
+                 * We cannot confirm the result.
+                 *
+                 * DO NOT refund yet.
+                 *
+                 * Keep both records pending.
+                 */
+                Log::warning(
+                    'Cable TV transaction status unknown',
                     [
-                        'user_id' =>
-                            $user->id,
-
-                        'amount' =>
-                            $amount,
+                        'request_id' =>
+                            $requestId,
 
                         'error' =>
-                            $refundException->getMessage(),
+                            $requeryException->getMessage(),
                     ]
                 );
+
+                $transaction->update([
+                    'status' =>
+                        'pending',
+
+                    'response_message' =>
+                        'Transaction status is being checked.',
+                ]);
+
+                $generalTransaction =
+                    Transaction::where(
+                        'reference',
+                        $requestId
+                    )
+                        ->where(
+                            'user_id',
+                            $user->id
+                        )
+                        ->first();
+
+                if ($generalTransaction) {
+
+                    $generalTransaction->update([
+                        'status' =>
+                            'pending',
+                    ]);
+                }
+
+                return response()->json([
+                    'success' =>
+                        false,
+
+                    'status' =>
+                        'pending',
+
+                    'message' =>
+                        'We could not confirm the transaction yet. Please check your transaction history.',
+                ], 202);
             }
-
-            return response()->json([
-                'success' => false,
-
-                'message' =>
-                    'Unable to complete the cable TV transaction. Please try again.',
-            ], 500);
         }
     }
 
@@ -579,11 +882,15 @@ class CableTvController extends Controller
             ) {
 
                 $user = \App\Models\User::query()
-                    ->where('id', $userId)
+                    ->where(
+                        'id',
+                        $userId
+                    )
                     ->lockForUpdate()
                     ->first();
 
                 if (!$user) {
+
                     throw new \RuntimeException(
                         'User account not found during refund.'
                     );
@@ -610,11 +917,25 @@ class CableTvController extends Controller
                 'request_id',
                 $requestId
             )
-            ->where(
-                'user_id',
-                auth()->id()
+                ->where(
+                    'user_id',
+                    auth()->id()
+                )
+                ->firstOrFail();
+
+        /*
+         * Find GENERAL transaction.
+         */
+        $generalTransaction =
+            Transaction::where(
+                'reference',
+                $requestId
             )
-            ->firstOrFail();
+                ->where(
+                    'user_id',
+                    auth()->id()
+                )
+                ->first();
 
         try {
 
@@ -623,16 +944,18 @@ class CableTvController extends Controller
                     $requestId
                 );
 
-            $status = strtolower(
-                data_get(
-                    $response,
-                    'content.transactions.status',
-                    ''
-                )
-            );
+            $status =
+                strtolower(
+                    data_get(
+                        $response,
+                        'content.transactions.status',
+                        ''
+                    )
+                );
 
             $transaction->update([
-                'api_response' => $response,
+                'api_response' =>
+                    $response,
 
                 'vtpass_transaction_id' =>
                     data_get(
@@ -641,6 +964,9 @@ class CableTvController extends Controller
                     ),
             ]);
 
+            /*
+             * SUCCESSFUL
+             */
             if (
                 in_array(
                     $status,
@@ -653,36 +979,137 @@ class CableTvController extends Controller
             ) {
 
                 $transaction->update([
-                    'status' => 'delivered',
+                    'status' =>
+                        'delivered',
 
-                    'purchased_at' => now(),
+                    'purchased_at' =>
+                        $transaction->purchased_at
+                        ?? now(),
 
                     'response_message' =>
                         'Transaction successful.',
                 ]);
+
+                if ($generalTransaction) {
+
+                    $generalTransaction->update([
+                        'status' =>
+                            'successful',
+                    ]);
+                }
+
+                return response()->json([
+                    'success' =>
+                        true,
+
+                    'status' =>
+                        'delivered',
+
+                    'message' =>
+                        'Cable TV transaction successful.',
+                ]);
+            }
+
+            /*
+             * FAILED
+             */
+            if (
+                in_array(
+                    $status,
+                    [
+                        'failed',
+                        'reversed',
+                        'cancelled',
+                    ],
+                    true
+                )
+                &&
+                $transaction->status !== 'refunded'
+            ) {
+
+                $this->refundWallet(
+                    $transaction->user_id,
+                    (float) $transaction->amount
+                );
+
+                $transaction->update([
+                    'status' =>
+                        'refunded',
+
+                    'response_message' =>
+                        'Transaction failed. Wallet refunded.',
+                ]);
+
+                if ($generalTransaction) {
+
+                    $generalTransaction->update([
+                        'status' =>
+                            'refunded',
+                    ]);
+                }
+
+                return response()->json([
+                    'success' =>
+                        false,
+
+                    'status' =>
+                        'refunded',
+
+                    'message' =>
+                        'Transaction failed. Your wallet has been refunded.',
+                ]);
+            }
+
+            /*
+             * STILL PENDING
+             */
+            $transaction->update([
+                'status' =>
+                    'pending',
+
+                'api_response' =>
+                    $response,
+            ]);
+
+            if ($generalTransaction) {
+
+                $generalTransaction->update([
+                    'status' =>
+                        'pending',
+                ]);
             }
 
             return response()->json([
-                'success' => true,
+                'success' =>
+                    true,
 
                 'status' =>
-                    $status ?: $transaction->status,
+                    'pending',
 
                 'message' =>
-                    $response[
-                        'response_description'
-                    ]
-                    ?? 'Transaction status retrieved.',
+                    'Transaction is still pending.',
             ]);
 
         } catch (Throwable $e) {
 
+            Log::error(
+                'Cable TV Transaction Requery Error',
+                [
+                    'request_id' =>
+                        $requestId,
+
+                    'error' =>
+                        $e->getMessage(),
+                ]
+            );
+
             return response()->json([
-                'success' => false,
+                'success' =>
+                    false,
 
                 'message' =>
-                    $e->getMessage(),
-            ], 422);
+                    'Unable to check transaction status.',
+            ], 500);
         }
     }
 }

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\EducationTransaction;
+use App\Models\Transaction;
 use App\Services\VtpassService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 class EducationController extends Controller
@@ -22,9 +24,6 @@ class EducationController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Display Education page.
-     */
     public function index()
     {
         $user = auth()->user();
@@ -50,20 +49,10 @@ class EducationController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Get available education services from VTpass.
-     *
-     * Example:
-     * jamb
-     * waec
-     * waec-registration
-     */
     public function services()
     {
         try {
-
-            $result =
-                $this->vtpass->educationServices();
+            $result = $this->vtpass->educationServices();
 
             return response()->json([
                 'success' => true,
@@ -81,8 +70,7 @@ class EducationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' =>
-                    'Unable to retrieve education services.',
+                'message' => 'Unable to retrieve education services.',
             ], 500);
         }
     }
@@ -94,36 +82,20 @@ class EducationController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Get education plans/variations.
-     */
     public function variations(string $serviceId)
     {
         try {
 
-            $serviceId =
-                strtolower(trim($serviceId));
+            $serviceId = strtolower(trim($serviceId));
 
-            $result =
-                $this->vtpass->educationVariations(
-                    $serviceId
-                );
+            $result = $this->vtpass->educationVariations(
+                $serviceId
+            );
 
             return response()->json([
                 'success' => true,
-
-                /*
-                 * Keep VTpass response available
-                 * to the frontend.
-                 */
                 'data' => $result,
-
-                /*
-                 * Also expose content directly
-                 * for easier JavaScript handling.
-                 */
-                'content' =>
-                    $result['content'] ?? [],
+                'content' => $result['content'] ?? [],
             ]);
 
         } catch (Throwable $e) {
@@ -138,8 +110,7 @@ class EducationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' =>
-                    $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -151,9 +122,6 @@ class EducationController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Verify JAMB profile/candidate.
-     */
     public function verifyJamb(Request $request)
     {
         $validated = $request->validate([
@@ -172,16 +140,14 @@ class EducationController extends Controller
 
         try {
 
-            $result =
-                $this->vtpass->verifyJamb(
-                    $validated['profile_id'],
-                    $validated['type']
-                );
+            $result = $this->vtpass->verifyJamb(
+                $validated['profile_id'],
+                $validated['type']
+            );
 
             return response()->json([
                 'success' => true,
-                'message' =>
-                    'JAMB profile verified successfully.',
+                'message' => 'JAMB profile verified successfully.',
                 'data' => $result,
             ]);
 
@@ -190,18 +156,14 @@ class EducationController extends Controller
             Log::error(
                 'JAMB verification error',
                 [
-                    'profile_id' =>
-                        $validated['profile_id'],
-
-                    'error' =>
-                        $e->getMessage(),
+                    'profile_id' => $validated['profile_id'],
+                    'error' => $e->getMessage(),
                 ]
             );
 
             return response()->json([
                 'success' => false,
-                'message' =>
-                    $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -213,9 +175,6 @@ class EducationController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Purchase an education service.
-     */
     public function purchase(Request $request)
     {
         $validated = $request->validate([
@@ -257,15 +216,11 @@ class EducationController extends Controller
             ],
         ]);
 
-
         $user = auth()->user();
 
-        $amount =
-            (float) $validated['amount'];
+        $amount = (float) $validated['amount'];
 
-        $quantity =
-            (int) ($validated['quantity'] ?? 1);
-
+        $quantity = (int) ($validated['quantity'] ?? 1);
 
         /*
         |--------------------------------------------------------------------------
@@ -273,15 +228,11 @@ class EducationController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (
-            (float) $user->wallet_balance
-            < $amount
-        ) {
+        if ((float) $user->wallet_balance < $amount) {
 
             return response()->json([
                 'success' => false,
-                'message' =>
-                    'Insufficient wallet balance.',
+                'message' => 'Insufficient wallet balance.',
             ], 422);
         }
 
@@ -292,62 +243,82 @@ class EducationController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $requestId =
-            $this->vtpass->generateRequestId();
+        $requestId = $this->vtpass->generateRequestId();
 
 
         /*
         |--------------------------------------------------------------------------
-        | CREATE LOCAL TRANSACTION
+        | CREATE LOCAL TRANSACTIONS
         |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        |
+        | We create BOTH:
+        |
+        | 1. EducationTransaction
+        | 2. General Transaction
+        |
+        | at the same time as the wallet deduction.
+        |
+        | The general transaction starts as "pending".
+        |
         */
 
         try {
 
-            $transaction =
-                DB::transaction(function () use (
-                    $user,
-                    $validated,
-                    $amount,
-                    $requestId
+            $transaction = DB::transaction(function () use (
+                $user,
+                $validated,
+                $amount,
+                $requestId
+            ) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | LOCK USER
+                |--------------------------------------------------------------------------
+                */
+
+                $lockedUser = $user->newQuery()
+                    ->whereKey($user->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                /*
+                |--------------------------------------------------------------------------
+                | CHECK WALLET AGAIN
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    (float) $lockedUser->wallet_balance < $amount
                 ) {
-
-                    /*
-                     * Lock the user row to prevent
-                     * simultaneous purchases from
-                     * spending the same wallet balance.
-                     */
-                    $lockedUser =
-                        $user->newQuery()
-                            ->whereKey($user->id)
-                            ->lockForUpdate()
-                            ->first();
-
-
-                    if (
-                        (float) $lockedUser->wallet_balance
-                        < $amount
-                    ) {
-
-                        throw new \RuntimeException(
-                            'Insufficient wallet balance.'
-                        );
-                    }
-
-
-                    /*
-                     * Deduct wallet.
-                     */
-                    $lockedUser->decrement(
-                        'wallet_balance',
-                        $amount
+                    throw new \RuntimeException(
+                        'Insufficient wallet balance.'
                     );
+                }
 
 
-                    /*
-                     * Create local transaction.
-                     */
-                    return EducationTransaction::create([
+                /*
+                |--------------------------------------------------------------------------
+                | DEDUCT WALLET
+                |--------------------------------------------------------------------------
+                */
+
+                $lockedUser->decrement(
+                    'wallet_balance',
+                    $amount
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | CREATE EDUCATION TRANSACTION
+                |--------------------------------------------------------------------------
+                */
+
+                $educationTransaction =
+                    EducationTransaction::create([
                         'user_id' =>
                             $lockedUser->id,
 
@@ -372,8 +343,60 @@ class EducationController extends Controller
                         'status' =>
                             'processing',
                     ]);
-                });
 
+
+                /*
+                |--------------------------------------------------------------------------
+                | CREATE GENERAL TRANSACTION
+                |--------------------------------------------------------------------------
+                |
+                | This is the record used by:
+                |
+                | User Transaction History
+                | Admin Transaction Dashboard
+                |
+                */
+
+                Transaction::create([
+                    'user_id' =>
+                        $lockedUser->id,
+
+                    'type' =>
+                        'debit',
+
+                    'service' =>
+                        'Education',
+
+                    'network' =>
+                        strtoupper(
+                            $validated['service_id']
+                        ),
+
+                    'phone' =>
+                        $validated['phone'],
+
+                    'amount' =>
+                        $amount,
+
+                    'status' =>
+                        'pending',
+
+                    'reference' =>
+                        $requestId,
+
+                    'discount' =>
+                        0,
+
+                    'profit' =>
+                        0,
+
+                    'total' =>
+                        $amount,
+                ]);
+
+
+                return $educationTransaction;
+            });
 
         } catch (Throwable $e) {
 
@@ -390,8 +413,7 @@ class EducationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' =>
-                    $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 422);
         }
 
@@ -404,36 +426,35 @@ class EducationController extends Controller
 
         try {
 
-            $result =
-                $this->vtpass->educationPurchase(
+            $result = $this->vtpass->educationPurchase(
 
-                    $validated['service_id'],
+                $validated['service_id'],
 
-                    $validated['billers_code'],
+                $validated['billers_code'],
 
-                    $validated['variation_code'],
+                $validated['variation_code'],
 
-                    $amount,
+                $amount,
 
-                    $validated['phone'],
+                $validated['phone'],
 
-                    $requestId
-
-                );
-
+                $requestId
+            );
 
         } catch (Throwable $e) {
 
             /*
-             * IMPORTANT:
-             *
-             * We do NOT immediately refund here.
-             *
-             * VTpass may have received/processed the
-             * request even if our HTTP connection failed.
-             *
-             * Mark it for requery instead.
-             */
+            |--------------------------------------------------------------------------
+            | CONNECTION ERROR
+            |--------------------------------------------------------------------------
+            |
+            | DO NOT REFUND YET.
+            |
+            | VTpass may have received the request.
+            |
+            | Keep both transactions pending.
+            |
+            */
 
             $transaction->update([
                 'status' => 'pending',
@@ -446,6 +467,13 @@ class EducationController extends Controller
                         $requestId,
                 ],
             ]);
+
+
+            $this->updateGeneralTransaction(
+                $user->id,
+                $requestId,
+                'pending'
+            );
 
 
             Log::error(
@@ -498,7 +526,7 @@ class EducationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | TRANSACTION ID
+        | VTPASS TRANSACTION ID
         |--------------------------------------------------------------------------
         */
 
@@ -564,6 +592,19 @@ class EducationController extends Controller
             ]);
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE GENERAL TRANSACTION
+            |--------------------------------------------------------------------------
+            */
+
+            $this->updateGeneralTransaction(
+                $user->id,
+                $requestId,
+                'successful'
+            );
+
+
             return response()->json([
 
                 'success' => true,
@@ -582,6 +623,11 @@ class EducationController extends Controller
 
                 'response' =>
                     $result,
+
+                'receipt_url' => route(
+                    'transaction.receipt',
+                    $transaction
+                ),
 
             ]);
         }
@@ -620,6 +666,19 @@ class EducationController extends Controller
                     $result,
 
             ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE EXISTING GENERAL TRANSACTION
+            |--------------------------------------------------------------------------
+            */
+
+            $this->updateGeneralTransaction(
+                $user->id,
+                $requestId,
+                'pending'
+            );
 
 
             return response()->json([
@@ -665,7 +724,7 @@ class EducationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | REFUND FAILED TRANSACTION
+        | REFUND WALLET
         |--------------------------------------------------------------------------
         */
 
@@ -687,18 +746,9 @@ class EducationController extends Controller
                     'wallet_balance',
                     $amount
                 );
-
             });
 
-
         } catch (Throwable $e) {
-
-            /*
-             * The purchase failed but refund also failed.
-             *
-             * This must be logged for admin
-             * reconciliation.
-             */
 
             Log::critical(
                 'EDUCATION REFUND FAILED',
@@ -731,6 +781,23 @@ class EducationController extends Controller
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE GENERAL TRANSACTION
+        |--------------------------------------------------------------------------
+        |
+        | Wallet has actually been refunded, therefore the
+        | general transaction becomes "refunded".
+        |
+        */
+
+        $this->updateGeneralTransaction(
+            $user->id,
+            $requestId,
+            'refunded'
+        );
+
+
         return response()->json([
 
             'success' => false,
@@ -757,13 +824,70 @@ class EducationController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | UPDATE GENERAL TRANSACTION
+    |--------------------------------------------------------------------------
+    */
+
+    private function updateGeneralTransaction(
+        int $userId,
+        string $requestId,
+        string $status
+    ): void {
+
+        $generalTransaction =
+            Transaction::where(
+                'user_id',
+                $userId
+            )
+            ->where(
+                'reference',
+                $requestId
+            )
+            ->first();
+
+
+        if ($generalTransaction) {
+
+            $generalTransaction->update([
+                'status' => $status,
+            ]);
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | SAFETY FALLBACK
+            |--------------------------------------------------------------------------
+            |
+            | This should normally never happen because the general
+            | transaction is created together with the education
+            | transaction.
+            |
+            | But if an older transaction does not have a general
+            | record, create one so history is not lost.
+            |
+            */
+
+            Log::warning(
+                'General education transaction not found',
+                [
+                    'user_id' =>
+                        $userId,
+
+                    'request_id' =>
+                        $requestId,
+                ]
+            );
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
     | RECENT TRANSACTIONS
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Return recent education transactions.
-     */
     public function transactions()
     {
         $transactions =
@@ -782,4 +906,3 @@ class EducationController extends Controller
         ]);
     }
 }
-

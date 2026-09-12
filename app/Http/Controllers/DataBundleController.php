@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataBundleTransaction;
+use App\Models\Transaction;
 use App\Services\VtpassService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,9 +31,9 @@ class DataBundleController extends Controller
             'user_id',
             $user->id
         )
-        ->latest()
-        ->take(5)
-        ->get();
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view(
             'BillVexa.Dashboard.Quick.data',
@@ -69,6 +70,7 @@ class DataBundleController extends Controller
         $serviceId = $serviceIds[$network];
 
         try {
+
             $response = $this->vtpass->variations($serviceId);
 
             if (($response['code'] ?? '000') !== '000') {
@@ -81,10 +83,6 @@ class DataBundleController extends Controller
 
             $content = $response['content'] ?? [];
 
-            /*
-             * VTpass responses may expose variations using
-             * either "variations" or the older "varations".
-             */
             $variations = $content['variations']
                 ?? $content['varations']
                 ?? [];
@@ -154,10 +152,7 @@ class DataBundleController extends Controller
         $serviceId = $serviceIds[$network];
 
         /*
-         * IMPORTANT:
-         *
-         * Do not trust amount sent by JavaScript.
-         *
+         * Do not trust the amount sent by JavaScript.
          * Get the current variation directly from VTpass.
          */
         try {
@@ -223,7 +218,12 @@ class DataBundleController extends Controller
         $requestId = $this->vtpass->generateRequestId();
 
         /*
-         * Create transaction and deduct wallet atomically.
+         * Create BOTH:
+         *
+         * 1. DataBundleTransaction
+         * 2. General Transaction
+         *
+         * and deduct wallet atomically.
          */
         try {
 
@@ -265,10 +265,11 @@ class DataBundleController extends Controller
                 $lockedUser->save();
 
                 /*
-                 * Create pending transaction.
+                 * Create service-specific transaction.
                  */
-                return DataBundleTransaction::create([
+                $dataTransaction = DataBundleTransaction::create([
                     'user_id' => $lockedUser->id,
+
                     'request_id' => $requestId,
 
                     'network' => strtoupper($network),
@@ -287,6 +288,40 @@ class DataBundleController extends Controller
 
                     'status' => 'pending',
                 ]);
+
+                /*
+                 * Create GENERAL transaction.
+                 *
+                 * This is what appears in:
+                 *
+                 * User Transaction History
+                 * Admin Transaction Management
+                 */
+                Transaction::create([
+                    'user_id' => $lockedUser->id,
+
+                    'type' => 'debit',
+
+                    'service' => 'Data',
+
+                    'network' => strtoupper($network),
+
+                    'phone' => $request->phone,
+
+                    'amount' => $amount,
+
+                    'status' => 'pending',
+
+                    'reference' => $requestId,
+
+                    'discount' => 0,
+
+                    'profit' => 0,
+
+                    'total' => $amount,
+                ]);
+
+                return $dataTransaction;
             });
 
         } catch (RuntimeException $e) {
@@ -322,13 +357,20 @@ class DataBundleController extends Controller
 
             $status =
                 strtolower(
-                    $vtpassTransaction['status']
-                    ?? ''
+                    $vtpassTransaction['status'] ?? ''
                 );
 
             $transactionId =
                 $vtpassTransaction['transactionId']
                 ?? null;
+
+            /*
+             * Find the GENERAL transaction.
+             */
+            $generalTransaction = Transaction::where(
+                'reference',
+                $requestId
+            )->first();
 
             /*
              * SUCCESS
@@ -353,15 +395,34 @@ class DataBundleController extends Controller
                     'purchased_at' => now(),
                 ]);
 
+                /*
+                 * Update GENERAL transaction.
+                 */
+                if ($generalTransaction) {
+                    $generalTransaction->update([
+                        'status' => 'successful',
+                    ]);
+                }
+
                 return response()->json([
                     'success' => true,
+
                     'status' => 'delivered',
+
                     'message' =>
                         'Data bundle purchased successfully.',
+
                     'transaction_id' =>
                         $transaction->id,
+
                     'amount' => $amount,
+
                     'phone' => $request->phone,
+
+                    'receipt_url' => route(
+                        'transaction.receipt',
+                        $generalTransaction
+                    ),
                 ]);
             }
 
@@ -383,11 +444,23 @@ class DataBundleController extends Controller
                     'api_response' => $response,
                 ]);
 
+                /*
+                 * General transaction remains pending.
+                 */
+                if ($generalTransaction) {
+                    $generalTransaction->update([
+                        'status' => 'pending',
+                    ]);
+                }
+
                 return response()->json([
                     'success' => true,
+
                     'status' => 'pending',
+
                     'message' =>
                         'Your data purchase is being processed.',
+
                     'transaction_id' =>
                         $transaction->id,
                 ]);
@@ -396,7 +469,7 @@ class DataBundleController extends Controller
             /*
              * FAILED
              *
-             * Refund the user's wallet.
+             * Refund wallet.
              */
             $this->refundWallet(
                 $user->id,
@@ -416,9 +489,20 @@ class DataBundleController extends Controller
                 'api_response' => $response,
             ]);
 
+            /*
+             * Update GENERAL transaction.
+             */
+            if ($generalTransaction) {
+                $generalTransaction->update([
+                    'status' => 'refunded',
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
+
                 'status' => 'failed',
+
                 'message' =>
                     $response['response_description']
                     ?? 'Data purchase failed. Your wallet has been refunded.',
@@ -428,7 +512,10 @@ class DataBundleController extends Controller
 
             Log::error('VTpass Data Purchase Error', [
                 'request_id' => $requestId,
-                'transaction_id' => $transaction->id,
+
+                'transaction_id' =>
+                    $transaction->id,
+
                 'error' => $e->getMessage(),
             ]);
 
@@ -450,6 +537,17 @@ class DataBundleController extends Controller
                         ?? ''
                     );
 
+                /*
+                 * Find general transaction.
+                 */
+                $generalTransaction = Transaction::where(
+                    'reference',
+                    $requestId
+                )->first();
+
+                /*
+                 * DELIVERED
+                 */
                 if ($requeryStatus === 'delivered') {
 
                     $transaction->update([
@@ -467,34 +565,54 @@ class DataBundleController extends Controller
                         'purchased_at' => now(),
                     ]);
 
+                    if ($generalTransaction) {
+                        $generalTransaction->update([
+                            'status' => 'successful',
+                        ]);
+                    }
+
                     return response()->json([
                         'success' => true,
+
                         'status' => 'delivered',
+
                         'message' =>
                             'Data bundle purchased successfully.',
                     ]);
                 }
 
+                /*
+                 * PENDING
+                 */
                 if ($requeryStatus === 'pending') {
 
                     $transaction->update([
                         'status' => 'pending',
+
                         'api_response' => $requery,
+
                         'response_message' =>
                             'Transaction is still being processed.',
                     ]);
 
+                    if ($generalTransaction) {
+                        $generalTransaction->update([
+                            'status' => 'pending',
+                        ]);
+                    }
+
                     return response()->json([
                         'success' => true,
+
                         'status' => 'pending',
+
                         'message' =>
                             'Your data purchase is still being processed.',
                     ]);
                 }
 
                 /*
-                 * If VTpass confirms failure,
-                 * refund the wallet.
+                 * CONFIRMED FAILURE
                  */
                 $this->refundWallet(
                     $user->id,
@@ -503,14 +621,24 @@ class DataBundleController extends Controller
 
                 $transaction->update([
                     'status' => 'failed',
+
                     'api_response' => $requery,
+
                     'response_message' =>
                         'Transaction failed. Wallet refunded.',
                 ]);
 
+                if ($generalTransaction) {
+                    $generalTransaction->update([
+                        'status' => 'refunded',
+                    ]);
+                }
+
                 return response()->json([
                     'success' => false,
+
                     'status' => 'failed',
+
                     'message' =>
                         'Data purchase failed. Your wallet has been refunded.',
                 ], 422);
@@ -520,8 +648,7 @@ class DataBundleController extends Controller
                 /*
                  * Unknown transaction state.
                  *
-                 * Keep the transaction pending instead of
-                 * risking a double refund.
+                 * Keep both transactions pending.
                  */
                 $transaction->update([
                     'status' => 'pending',
@@ -530,9 +657,22 @@ class DataBundleController extends Controller
                         'Transaction status is being checked.',
                 ]);
 
+                $generalTransaction = Transaction::where(
+                    'reference',
+                    $requestId
+                )->first();
+
+                if ($generalTransaction) {
+                    $generalTransaction->update([
+                        'status' => 'pending',
+                    ]);
+                }
+
                 return response()->json([
                     'success' => false,
+
                     'status' => 'pending',
+
                     'message' =>
                         'We could not confirm the transaction yet. Please check your transaction history.',
                 ], 202);
@@ -549,11 +689,25 @@ class DataBundleController extends Controller
             'request_id',
             $requestId
         )
-        ->where(
-            'user_id',
-            auth()->id()
+            ->where(
+                'user_id',
+                auth()->id()
+            )
+            ->firstOrFail();
+
+        /*
+         * Find the GENERAL transaction using
+         * the same VTpass request ID.
+         */
+        $generalTransaction = Transaction::where(
+            'reference',
+            $requestId
         )
-        ->firstOrFail();
+            ->where(
+                'user_id',
+                auth()->id()
+            )
+            ->first();
 
         try {
 
@@ -565,8 +719,7 @@ class DataBundleController extends Controller
 
             $status =
                 strtolower(
-                    $vtpassTransaction['status']
-                    ?? ''
+                    $vtpassTransaction['status'] ?? ''
                 );
 
             /*
@@ -591,9 +744,20 @@ class DataBundleController extends Controller
                         ?? now(),
                 ]);
 
+                /*
+                 * Update general history.
+                 */
+                if ($generalTransaction) {
+                    $generalTransaction->update([
+                        'status' => 'successful',
+                    ]);
+                }
+
                 return response()->json([
                     'success' => true,
+
                     'status' => 'delivered',
+
                     'message' =>
                         'Data bundle delivered successfully.',
                 ]);
@@ -624,9 +788,20 @@ class DataBundleController extends Controller
                     'api_response' => $response,
                 ]);
 
+                /*
+                 * Update general history.
+                 */
+                if ($generalTransaction) {
+                    $generalTransaction->update([
+                        'status' => 'refunded',
+                    ]);
+                }
+
                 return response()->json([
                     'success' => false,
+
                     'status' => 'failed',
+
                     'message' =>
                         'Transaction failed. Your wallet has been refunded.',
                 ]);
@@ -637,12 +812,21 @@ class DataBundleController extends Controller
              */
             $transaction->update([
                 'status' => 'pending',
+
                 'api_response' => $response,
             ]);
 
+            if ($generalTransaction) {
+                $generalTransaction->update([
+                    'status' => 'pending',
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
+
                 'status' => 'pending',
+
                 'message' =>
                     'Transaction is still pending.',
             ]);
@@ -651,11 +835,13 @@ class DataBundleController extends Controller
 
             Log::error('Data Transaction Requery Error', [
                 'request_id' => $requestId,
+
                 'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
+
                 'message' =>
                     'Unable to check transaction status.',
             ], 500);
@@ -669,6 +855,7 @@ class DataBundleController extends Controller
         int $userId,
         float $amount
     ): void {
+
         DB::transaction(function () use (
             $userId,
             $amount
@@ -678,8 +865,8 @@ class DataBundleController extends Controller
                 'id',
                 $userId
             )
-            ->lockForUpdate()
-            ->first();
+                ->lockForUpdate()
+                ->first();
 
             if (!$user) {
                 return;

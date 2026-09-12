@@ -25,42 +25,6 @@
 
     </div>
 
-    <div>
-
-        <button class="btn btn-danger me-2">
-
-            <a href="{{ route('admin.reports.export',['revenue','pdf']) }}"
-            class="btn btn-danger">
-                <i class="bi bi-file-earmark-pdf me-2"></i>
-
-                Export PDF
-            </a>    
-
-        </button>
-
-        <button class="btn btn-success me-2">
-
-            <a href="{{ route('admin.reports.export',['revenue','excel']) }}"
-            class="btn btn-success">
-                <i class="bi bi-file-earmark-excel me-2"></i>
-
-                Export Excel
-            </a>    
-
-        </button>
-
-        <button class="btn btn-primary">
-
-            <a href="{{ route('admin.reports.export',['revenue','csv']) }}"
-            class="btn btn-primary">
-                <i class="bi bi-filetype-csv me-2"></i>
-
-                Export CSV
-            </a>
-        </button>
-
-    </div>
-
 </div>
 
 <!-- Reports -->

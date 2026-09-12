@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlutterwaveVirtualAccountController;
 use App\Http\Controllers\ElectricityController;
+use App\Http\Controllers\ReceiptController;
+use App\Mail\TransactionStatusMail;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
@@ -76,6 +79,35 @@ Route::get('/terms', function () {
 Route::get('/refund', function () {
     return view('BillVexa.Footer.Refund-Policy');
 })->name('refund');
+
+
+/*
+|--------------------------------------------------------------------------
+| test-email
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get('/test-email', function () {
+
+    $transaction = Transaction::with('user')->latest()->first();
+
+    if (!$transaction) {
+        return 'No transaction found.';
+    }
+
+    if (!$transaction->user || !$transaction->user->email) {
+        return 'The transaction user does not have an email address.';
+    }
+
+    Mail::to($transaction->user->email)
+        ->send(new TransactionStatusMail(
+            $transaction,
+            'approved'
+        ));
+
+    return 'Test email sent to ' . $transaction->user->email;
+});
 
 
 
@@ -207,6 +239,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard/history', [TransactionController::class, 'index'])
         ->name('history');
+
+        Route::get(
+            '/transactions/{transaction}/receipt',
+            [ReceiptController::class, 'download']
+        )->name('transaction.receipt');
     
         /*
     |--------------------------------------------------------------------------
@@ -270,6 +307,7 @@ Route::middleware('auth')->group(function () {
     // Logout Other Devices
     Route::delete('/dashboard/profile/devices/logout', [ProfileController::class, 'logoutOtherDevices'])
         ->name('profile.devices.logout');
+        
 
 
     /*

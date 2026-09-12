@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\TransactionStatusMail;
 use App\Models\AdminNotification;
 use App\Models\Notification;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class TransactionController extends Controller
 {
@@ -62,23 +66,95 @@ class TransactionController extends Controller
     {
         return view('admin.transaction-view', compact('transaction'));
     }
+   
+    public function exportTransactions(Request $request)
+    {
+        $type = $request->get('type', 'all');
+    
+        $data = Transaction::with('user')
+            ->latest()
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'Reference' => $transaction->reference,
+                    'User' => $transaction->user?->name ?? 'N/A',
+                    'Email' => $transaction->user?->email ?? 'N/A',
+                    'Service' => $transaction->service,
+                    'Network' => $transaction->network,
+                    'Phone' => $transaction->phone,
+                    'Amount' => $transaction->amount,
+                    'Discount' => $transaction->discount,
+                    'Profit' => $transaction->profit,
+                    'Total' => $transaction->total,
+                    'Status' => $transaction->status,
+                    'Date' => $transaction->created_at?->format('d M Y, h:i A'),
+                ];
+            });
+    
+        $setting = \App\Models\Setting::first();
+    
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('Admin.exports', [
+            'type' => $type,
+            'data' => $data,
+            'setting' => $setting,
+        ]);
+    
+        $pdf->setPaper('a4', 'landscape');
+    
+        return $pdf->download(
+            'BillVexa-transactions-' . now()->format('Y-m-d') . '.pdf'
+        );
+    }
+    
+    
+    
 
     public function approve(Transaction $transaction)
     {
-        if ($transaction->status !== 'approved') {
-            return back()->with('error', 'Only successful transactions can be approved.');
+        if ($transaction->status !== 'pending') {
+            return back()->with('error', 'Only pending transactions can be approved.');
         }
-        
+    
         $transaction->update([
-            'status' => 'successful'
+            'status' => 'successful',
+        ]);
+    
+        Notification::create([
+            'user_id' => $transaction->user_id,
+            'title' => 'Transaction Approved',
+            'message' => 'Your ₦' . number_format($transaction->total, 2) .
+                         ' ' . $transaction->service .
+                         ' transaction has been approved successfully.',
+            'link' => route('history'),
         ]);
 
+        // Email notification to user
+        if ($transaction->user && $transaction->user->email) {
+            Mail::to($transaction->user->email)
+                ->send(new TransactionStatusMail(
+                    $transaction,
+                    'approved'
+                ));
+        }
+    
+        AdminNotification::create([
+            'admin_id' => auth('admin')->id(),
+            'recipient_type' => 'admin',
+            'title' => 'Transaction Approved',
+            'message' => auth('admin')->user()->name .
+                         ' approved a ₦' .
+                         number_format($transaction->total, 2) .
+                         ' ' . $transaction->service .
+                         ' transaction.',
+            'link' => route('admin.transaction.show', $transaction),
+        ]);
+    
         return back()->with('success', 'Transaction approved successfully.');
     }
 
     public function reverse(Transaction $transaction)
     {
-        if ($transaction->status !== 'reversed') {
+        if ($transaction->status !== 'successful') {
             return back()->with('error', 'Only successful transactions can be reverse.');
         }
         
@@ -87,40 +163,110 @@ class TransactionController extends Controller
             'status' => 'reversed'
         ]);
 
+        Notification::create([
+            'user_id' => $transaction->user_id,
+            'title' => 'Transaction Reversed',
+            'message' => 'Your ₦' . number_format($transaction->total, 2) .
+                         ' ' . $transaction->service .
+                         ' transaction has been reversed successfully.',
+            'link' => route('history'),
+        ]);
+
+        // Email notification
+        if ($transaction->user && $transaction->user->email) {
+            Mail::to($transaction->user->email)
+                ->send(new TransactionStatusMail(
+                    $transaction,
+                    'reversed'
+                ));
+        }
+
+        AdminNotification::create([
+            'admin_id' => auth('admin')->id(),
+            'recipient_type' => 'admin',
+            'title' => 'Transaction Reversed',
+            'message' => auth('admin')->user()->name .
+                         ' reversed a ₦' .
+                         number_format($transaction->total, 2) .
+                         ' ' . $transaction->service .
+                         ' transaction.',
+            'link' => route('admin.transaction.show', $transaction),
+        ]);
+
         return back()->with('success', 'Transaction reversed successfully.');
     }
 
     public function refund(Transaction $transaction)
     {
-        if ($transaction->status !== 'refounded') {
-            return back()->with('error', 'Only successful transactions can be refunded.');
+        if ($transaction->status !== 'successful') {
+            return back()->with(
+                'error',
+                'Only successful transactions can be refunded.'
+            );
         }
-        // Update transaction
-        $transaction->update([
-            'status' => 'refunded'
-        ]);
     
-        // Notify the user
-        Notification::create([
-            'user_id' => $transaction->user_id,
-            'title' => 'Transaction Refunded',
-            'message' => '₦' . number_format($transaction->amount, 2) . ' has been refunded to your wallet.',
-            'link' => route('history'),
-        ]);
+        DB::transaction(function () use ($transaction) {
     
-        // Notify the admin dashboard
-        AdminNotification::create([
-            'admin_id' => auth('admin')->id(), // optional but recommended
-            'title' => 'Transaction Refunded',
-            'message' => auth('admin')->user()->name .
-                         ' refunded ₦' .
-                         number_format($transaction->amount, 2) .
-                         ' to ' . $transaction->user->name,
-            'link' => route('admin.transaction.show', $transaction),
-        ]);
+            $user = \App\Models\User::lockForUpdate()
+                ->find($transaction->user_id);
     
-        return back()->with('success', 'Transaction refunded successfully.');
+            if (!$user) {
+                throw new \RuntimeException('User not found.');
+            }
+    
+            // Return money to wallet
+            $user->increment(
+                'wallet_balance',
+                $transaction->total
+            );
+    
+            // Mark transaction as refunded
+            $transaction->update([
+                'status' => 'refunded',
+            ]);
+    
+            // In-app notification
+            Notification::create([
+                'user_id' => $transaction->user_id,
+                'title' => 'Transaction Refunded',
+                'message' => '₦' .
+                             number_format($transaction->total, 2) .
+                             ' has been refunded to your wallet for your ' .
+                             $transaction->service .
+                             ' transaction.',
+                'link' => route('history'),
+            ]);
+    
+            // Email notification
+            if ($user->email) {
+                Mail::to($user->email)
+                    ->send(new TransactionStatusMail(
+                        $transaction,
+                        'refunded'
+                    ));
+            }
+    
+            // Admin notification
+            AdminNotification::create([
+                'admin_id' => auth('admin')->id(),
+                'recipient_type' => 'admin',
+                'title' => 'Transaction Refunded',
+                'message' => 'BillVexa Admin refunded ₦' .
+                             number_format($transaction->total, 2) .
+                             ' to the user for a ' .
+                             $transaction->service .
+                             ' transaction.',
+                'link' => route(
+                    'admin.transaction.show',
+                    $transaction
+                ),
+            ]);
+        });
+    
+        return back()->with(
+            'success',
+            'Transaction refunded successfully.'
+        );
     }
-    
 
 }

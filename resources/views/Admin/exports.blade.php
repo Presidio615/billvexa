@@ -3,21 +3,23 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{ ucfirst($type) }} Report</title>
+
+    <title>
+        {{ ucfirst($type) }} Transactions Report
+    </title>
 
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 9px;
             color: #333;
-            margin: 30px;
+            margin: 25px;
         }
 
         .header {
             width: 100%;
+            margin-bottom: 20px;
             border-bottom: 2px solid #0d6efd;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
         }
 
         .logo {
@@ -26,106 +28,94 @@
         }
 
         .company-name {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #0d6efd;
-            margin-bottom: 5px;
         }
 
         .contact {
-            font-size: 11px;
-            line-height: 1.5;
+            font-size: 10px;
             color: #666;
         }
 
         .report-title {
             text-align: center;
-            margin: 25px 0 10px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
+            margin: 20px 0 5px;
         }
 
         .report-date {
             text-align: right;
-            font-size: 11px;
-            margin-bottom: 20px;
+            font-size: 9px;
+            margin-bottom: 15px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            /* table-layout:fixed; */
         }
 
-        table th {
+        th {
             background: #0d6efd;
-            color: #fff;
+            color: white;
             border: 1px solid #ddd;
-            padding: 8px;
-            font-size: 9px;
-            word-wrap:break-word;
-            overflow-wrap:break-word;
+            padding: 6px;
+            font-size: 8px;
         }
 
-        table td {
+        td {
             border: 1px solid #ddd;
             padding: 5px;
-            font-size: 9px;
-            word-wrap:break-word;
-            overflow-wrap:break-word;
+            font-size: 8px;
         }
 
-        table tr:nth-child(even) {
+        tr:nth-child(even) {
             background: #f8f9fa;
         }
 
         .footer {
-            margin-top: 35px;
+            margin-top: 25px;
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             color: #777;
             border-top: 1px solid #ddd;
-            padding-top: 10px;
+            padding-top: 8px;
         }
     </style>
-
 </head>
 
 <body>
 
-    <!-- Header -->
-
-    <table class="header" style="border: none;">
-        <tr style="border: none;">
-
-            <td style="border: none; width:80px;">
+    <table class="header">
+        <tr>
+            <td style="width:80px; border:none;">
 
                 @if($setting && $setting->logo)
-                    <img src="{{ public_path('storage/'.$setting->logo) }}"
-                         class="logo">
+                    <img
+                        src="{{ public_path('storage/' . $setting->logo) }}"
+                        class="logo"
+                    >
                 @endif
 
             </td>
 
-            <td style="border: none;">
+            <td style="border:none;">
 
                 <div class="company-name">
-                    {{ $setting->site_name }}
+                    {{ $setting->site_name ?? 'BillVexa' }}
                 </div>
 
                 <div class="contact">
-                    {!! nl2br(e($setting->contact_information)) !!}
+                    {!! nl2br(e($setting->contact_information ?? '')) !!}
                 </div>
 
             </td>
-
         </tr>
     </table>
 
-    <!-- Report Title -->
-
     <div class="report-title">
-        {{ ucfirst($type) }} Report
+        {{ ucfirst($type) }} Transactions Report
     </div>
 
     <div class="report-date">
@@ -133,20 +123,17 @@
         {{ now()->format('d M Y, h:i A') }}
     </div>
 
-    <!-- Report Table -->
-
     <table>
 
         <thead>
-
             <tr>
 
                 @if($data->count())
 
-                    @foreach(array_keys($data->first()->toArray()) as $column)
+                    @foreach(array_keys($data->first()) as $column)
 
                         <th>
-                            {{ ucwords(str_replace('_', ' ', $column)) }}
+                            {{ $column }}
                         </th>
 
                     @endforeach
@@ -154,7 +141,6 @@
                 @endif
 
             </tr>
-
         </thead>
 
         <tbody>
@@ -163,9 +149,11 @@
 
                 <tr>
 
-                    @foreach($row->toArray() as $value)
+                    @foreach($row as $value)
 
-                        <td>{{ $value }}</td>
+                        <td>
+                            {{ $value ?? '' }}
+                        </td>
 
                     @endforeach
 
@@ -174,11 +162,9 @@
             @empty
 
                 <tr>
-
-                    <td colspan="100%" style="text-align:center;">
-                        No records found.
+                    <td colspan="20" style="text-align:center;">
+                        No transactions found.
                     </td>
-
                 </tr>
 
             @endforelse
@@ -187,13 +173,14 @@
 
     </table>
 
-    <!-- Footer -->
-
     <div class="footer">
 
         © {{ date('Y') }}
-        {{ $setting->site_name }} |
-        Generated by {{ $setting->site_name ?? 'BillVexa' }} Admin System
+
+        {{ $setting->site_name ?? 'BillVexa' }}
+
+        | Generated by
+        {{ $setting->site_name ?? 'BillVexa' }} Admin System
 
     </div>
 

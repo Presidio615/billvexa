@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ElectricityTransaction;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Services\VtpassService;
 use Illuminate\Http\Request;
@@ -18,18 +19,21 @@ class ElectricityController extends Controller
     }
 
 
-    /**
-     * Electricity dashboard
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | ELECTRICITY DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
     public function index()
     {
         $transactions = ElectricityTransaction::where(
             'user_id',
             auth()->id()
         )
-        ->latest()
-        ->take(10)
-        ->get();
+            ->latest()
+            ->take(10)
+            ->get();
 
         return view(
             'Billvexa.Dashboard.Quick.Electricity',
@@ -38,27 +42,30 @@ class ElectricityController extends Controller
     }
 
 
-    /**
-     * Verify meter number
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFY METER
+    |--------------------------------------------------------------------------
+    */
+
     public function verifyMeter(Request $request)
     {
         $validated = $request->validate([
             'provider' => [
                 'required',
-                'in:IKEDC,EKEDC,AEDC,KEDCO,PHEDC,JEDC,KAEDCO,EEDC,IBEDC,BEDC,YEDC'
+                'in:IKEDC,EKEDC,AEDC,KEDCO,PHEDC,JEDC,KAEDCO,EEDC,IBEDC,BEDC,YEDC',
             ],
 
             'meter_type' => [
                 'required',
-                'in:prepaid,postpaid'
+                'in:prepaid,postpaid',
             ],
 
             'meter_number' => [
                 'required',
                 'string',
                 'min:5',
-                'max:30'
+                'max:30',
             ],
         ]);
 
@@ -128,7 +135,8 @@ class ElectricityController extends Controller
                     $content['Can_Vend']
                     ?? 'yes',
 
-                'data' => $content,
+                'data' =>
+                    $content,
             ]);
 
         } catch (Throwable $e) {
@@ -136,12 +144,17 @@ class ElectricityController extends Controller
             Log::error(
                 'Electricity meter verification failed',
                 [
-                    'user_id' => auth()->id(),
+                    'user_id' =>
+                        auth()->id(),
+
                     'provider' =>
                         $validated['provider'],
+
                     'meter_number' =>
                         $validated['meter_number'],
-                    'error' => $e->getMessage(),
+
+                    'error' =>
+                        $e->getMessage(),
                 ]
             );
 
@@ -151,54 +164,63 @@ class ElectricityController extends Controller
 
                 'message' =>
                     $e->getMessage()
-                    ?: 'Unable to verify meter.'
+                    ?: 'Unable to verify meter.',
             ], 422);
         }
     }
 
 
-    /**
-     * Purchase electricity
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | PURCHASE ELECTRICITY
+    |--------------------------------------------------------------------------
+    */
+
     public function purchase(Request $request)
     {
         $validated = $request->validate([
             'provider' => [
                 'required',
-                'in:IKEDC,EKEDC,AEDC,KEDCO,PHEDC,JEDC,KAEDCO,EEDC,IBEDC,BEDC,YEDC'
+                'in:IKEDC,EKEDC,AEDC,KEDCO,PHEDC,JEDC,KAEDCO,EEDC,IBEDC,BEDC,YEDC',
             ],
 
             'meter_type' => [
                 'required',
-                'in:prepaid,postpaid'
+                'in:prepaid,postpaid',
             ],
 
             'meter_number' => [
                 'required',
                 'string',
                 'min:5',
-                'max:30'
+                'max:30',
             ],
 
             'amount' => [
                 'required',
                 'numeric',
                 'min:500',
-                'max:1000000'
+                'max:1000000',
             ],
 
             'phone' => [
                 'required',
-                'regex:/^[0-9]{10,15}$/'
+                'regex:/^[0-9]{10,15}$/',
             ],
 
             'customer_name' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
         ]);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | SERVICE IDs
+        |--------------------------------------------------------------------------
+        */
 
         $serviceIds = [
             'IKEDC'  => 'ikeja-electric',
@@ -227,22 +249,11 @@ class ElectricityController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Discount
+        | DISCOUNT
         |--------------------------------------------------------------------------
         */
 
         $discount = 0;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANT
-        |--------------------------------------------------------------------------
-        |
-        | Replace this with your existing Setting model
-        | once we connect the admin electricity discount.
-        |
-        */
 
         if (config('services.electricity.discount')) {
 
@@ -253,13 +264,22 @@ class ElectricityController extends Controller
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL
+        |--------------------------------------------------------------------------
+        */
+
         $total =
-            max(0, $amount - $discount);
+            max(
+                0,
+                $amount - $discount
+            );
 
 
         /*
         |--------------------------------------------------------------------------
-        | Generate VTpass request ID
+        | GENERATE REQUEST ID
         |--------------------------------------------------------------------------
         */
 
@@ -269,8 +289,16 @@ class ElectricityController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Deduct wallet and create pending transaction
+        | DEDUCT WALLET + CREATE LOCAL TRANSACTIONS
         |--------------------------------------------------------------------------
+        |
+        | Two records are created together:
+        |
+        | 1. ElectricityTransaction
+        | 2. General Transaction
+        |
+        | The general transaction starts as "pending".
+        |
         */
 
         try {
@@ -286,12 +314,25 @@ class ElectricityController extends Controller
                     $total
                 ) {
 
-                    $user = User::whereKey(
-                        auth()->id()
-                    )
-                    ->lockForUpdate()
-                    ->firstOrFail();
+                    /*
+                    |--------------------------------------------------------------------------
+                    | LOCK USER
+                    |--------------------------------------------------------------------------
+                    */
 
+                    $user =
+                        User::whereKey(
+                            auth()->id()
+                        )
+                        ->lockForUpdate()
+                        ->firstOrFail();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CHECK WALLET
+                    |--------------------------------------------------------------------------
+                    */
 
                     if (
                         (float) $user->wallet_balance
@@ -304,6 +345,12 @@ class ElectricityController extends Controller
                     }
 
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DEDUCT WALLET
+                    |--------------------------------------------------------------------------
+                    */
+
                     $user->wallet_balance =
                         (float) $user->wallet_balance
                         - $total;
@@ -311,48 +358,119 @@ class ElectricityController extends Controller
                     $user->save();
 
 
-                    return ElectricityTransaction::create([
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CREATE ELECTRICITY TRANSACTION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $electricityTransaction =
+                        ElectricityTransaction::create([
+                            'user_id' =>
+                                $user->id,
+
+                            'request_id' =>
+                                $requestId,
+
+                            'provider' =>
+                                $provider,
+
+                            'service_id' =>
+                                $serviceId,
+
+                            'meter_number' =>
+                                $validated['meter_number'],
+
+                            'meter_type' =>
+                                $validated['meter_type'],
+
+                            'customer_name' =>
+                                $validated['customer_name']
+                                ?? null,
+
+                            'amount' =>
+                                $amount,
+
+                            'discount' =>
+                                $discount,
+
+                            'total' =>
+                                $total,
+
+                            'phone' =>
+                                $validated['phone'],
+
+                            'status' =>
+                                'pending',
+                        ]);
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CREATE GENERAL TRANSACTION
+                    |--------------------------------------------------------------------------
+                    |
+                    | This is what the user transaction history
+                    | and admin transaction dashboard use.
+                    |
+                    */
+
+                    Transaction::create([
                         'user_id' =>
                             $user->id,
 
-                        'request_id' =>
-                            $requestId,
+                        'type' =>
+                            'debit',
 
-                        'provider' =>
+                        'service' =>
+                            'Electricity',
+
+                        'network' =>
                             $provider,
-
-                        'service_id' =>
-                            $serviceId,
-
-                        'meter_number' =>
-                            $validated['meter_number'],
-
-                        'meter_type' =>
-                            $validated['meter_type'],
-
-                        'customer_name' =>
-                            $validated['customer_name']
-                            ?? null,
-
-                        'amount' =>
-                            $amount,
-
-                        'discount' =>
-                            $discount,
-
-                        'total' =>
-                            $total,
 
                         'phone' =>
                             $validated['phone'],
 
+                        'amount' =>
+                            $amount,
+
                         'status' =>
                             'pending',
+
+                        'reference' =>
+                            $requestId,
+
+                        'discount' =>
+                            $discount,
+
+                        'profit' =>
+                            0,
+
+                        'total' =>
+                            $total,
                     ]);
+
+
+                    return $electricityTransaction;
                 });
 
 
         } catch (Throwable $e) {
+
+            Log::error(
+                'Electricity wallet reservation failed',
+                [
+                    'user_id' =>
+                        auth()->id(),
+
+                    'request_id' =>
+                        $requestId,
+
+                    'error' =>
+                        $e->getMessage(),
+                ]
+            );
+
 
             return back()
                 ->withInput()
@@ -365,7 +483,7 @@ class ElectricityController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Send payment to VTpass
+        | SEND PAYMENT TO VTPASS
         |--------------------------------------------------------------------------
         */
 
@@ -383,7 +501,8 @@ class ElectricityController extends Controller
 
 
             $code =
-                $response['code'] ?? null;
+                $response['code']
+                ?? null;
 
 
             $transactionData =
@@ -438,7 +557,7 @@ class ElectricityController extends Controller
                     $status,
                     [
                         'delivered',
-                        'successful'
+                        'successful',
                     ],
                     true
                 )
@@ -458,9 +577,7 @@ class ElectricityController extends Controller
                         $vtpassTransactionId,
 
                     'response_message' =>
-                        $response[
-                            'response_description'
-                        ]
+                        $response['response_description']
                         ?? 'Electricity payment successful.',
 
                     'api_response' =>
@@ -469,6 +586,19 @@ class ElectricityController extends Controller
                     'purchased_at' =>
                         now(),
                 ]);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE GENERAL TRANSACTION
+                |--------------------------------------------------------------------------
+                */
+
+                $this->updateGeneralTransaction(
+                    $transaction->user_id,
+                    $requestId,
+                    'successful'
+                );
 
 
                 return redirect()
@@ -492,7 +622,7 @@ class ElectricityController extends Controller
                     [
                         'pending',
                         'initiated',
-                        'processing'
+                        'processing',
                     ],
                     true
                 )
@@ -506,14 +636,25 @@ class ElectricityController extends Controller
                         $vtpassTransactionId,
 
                     'response_message' =>
-                        $response[
-                            'response_description'
-                        ]
+                        $response['response_description']
                         ?? 'Transaction is processing.',
 
                     'api_response' =>
                         $response,
                 ]);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GENERAL TRANSACTION REMAINS PENDING
+                |--------------------------------------------------------------------------
+                */
+
+                $this->updateGeneralTransaction(
+                    $transaction->user_id,
+                    $requestId,
+                    'pending'
+                );
 
 
                 return redirect()
@@ -539,9 +680,7 @@ class ElectricityController extends Controller
                     $vtpassTransactionId,
 
                 'response_message' =>
-                    $response[
-                        'response_description'
-                    ]
+                    $response['response_description']
                     ?? 'Electricity payment failed.',
 
                 'api_response' =>
@@ -549,8 +688,31 @@ class ElectricityController extends Controller
             ]);
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | REFUND WALLET
+            |--------------------------------------------------------------------------
+            */
+
             $this->refund(
                 $transaction
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE GENERAL TRANSACTION
+            |--------------------------------------------------------------------------
+            |
+            | Because the wallet has now been refunded,
+            | the general transaction becomes "refunded".
+            |
+            */
+
+            $this->updateGeneralTransaction(
+                $transaction->user_id,
+                $requestId,
+                'refunded'
             );
 
 
@@ -569,7 +731,7 @@ class ElectricityController extends Controller
             | UNKNOWN RESULT
             |--------------------------------------------------------------------------
             |
-            | DO NOT REFUND here.
+            | DO NOT REFUND HERE.
             |
             | VTpass may have received the transaction.
             |
@@ -604,6 +766,19 @@ class ElectricityController extends Controller
             ]);
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | GENERAL TRANSACTION REMAINS PENDING
+            |--------------------------------------------------------------------------
+            */
+
+            $this->updateGeneralTransaction(
+                $transaction->user_id,
+                $requestId,
+                'pending'
+            );
+
+
             return redirect()
                 ->route('electricity')
                 ->with(
@@ -614,9 +789,12 @@ class ElectricityController extends Controller
     }
 
 
-    /**
-     * Requery transaction
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | REQUERY TRANSACTION
+    |--------------------------------------------------------------------------
+    */
+
     public function requery(
         string $requestId
     ) {
@@ -634,8 +812,7 @@ class ElectricityController extends Controller
 
 
         if (
-            $transaction->status
-            !== 'pending'
+            $transaction->status !== 'pending'
         ) {
 
             return back()->with(
@@ -654,7 +831,8 @@ class ElectricityController extends Controller
 
 
             $code =
-                $response['code'] ?? null;
+                $response['code']
+                ?? null;
 
 
             $transactionData =
@@ -671,6 +849,12 @@ class ElectricityController extends Controller
                 );
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | REQUERY SUCCESS
+            |--------------------------------------------------------------------------
+            */
+
             if (
                 $code === '000'
                 &&
@@ -678,7 +862,7 @@ class ElectricityController extends Controller
                     $status,
                     [
                         'delivered',
-                        'successful'
+                        'successful',
                     ],
                     true
                 )
@@ -708,9 +892,8 @@ class ElectricityController extends Controller
                         $units,
 
                     'vtpass_transaction_id' =>
-                        $transactionData[
-                            'transactionId'
-                        ]
+                        $transactionData['transactionId']
+                        ?? $transactionData['transaction_id']
                         ?? null,
 
                     'response_message' =>
@@ -724,6 +907,19 @@ class ElectricityController extends Controller
                 ]);
 
 
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE GENERAL TRANSACTION
+                |--------------------------------------------------------------------------
+                */
+
+                $this->updateGeneralTransaction(
+                    $transaction->user_id,
+                    $requestId,
+                    'successful'
+                );
+
+
                 return back()->with(
                     'success',
                     'Electricity payment successful.'
@@ -731,12 +927,19 @@ class ElectricityController extends Controller
             }
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | REQUERY FAILED
+            |--------------------------------------------------------------------------
+            */
+
             if (
                 in_array(
                     $status,
                     [
                         'failed',
-                        'reversed'
+                        'reversed',
+                        'cancelled',
                     ],
                     true
                 )
@@ -754,8 +957,27 @@ class ElectricityController extends Controller
                 ]);
 
 
+                /*
+                |--------------------------------------------------------------------------
+                | REFUND
+                |--------------------------------------------------------------------------
+                */
+
                 $this->refund(
                     $transaction
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE GENERAL TRANSACTION
+                |--------------------------------------------------------------------------
+                */
+
+                $this->updateGeneralTransaction(
+                    $transaction->user_id,
+                    $requestId,
+                    'refunded'
                 );
 
 
@@ -764,6 +986,19 @@ class ElectricityController extends Controller
                     'Payment failed. Your wallet has been refunded.'
                 );
             }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STILL PROCESSING
+            |--------------------------------------------------------------------------
+            */
+
+            $this->updateGeneralTransaction(
+                $transaction->user_id,
+                $requestId,
+                'pending'
+            );
 
 
             return back()->with(
@@ -794,9 +1029,73 @@ class ElectricityController extends Controller
     }
 
 
-    /**
-     * Refund failed transaction
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE GENERAL TRANSACTION
+    |--------------------------------------------------------------------------
+    */
+
+    protected function updateGeneralTransaction(
+        int $userId,
+        string $requestId,
+        string $status
+    ): void {
+
+        $generalTransaction =
+            Transaction::where(
+                'user_id',
+                $userId
+            )
+            ->where(
+                'reference',
+                $requestId
+            )
+            ->first();
+
+
+        if ($generalTransaction) {
+
+            $generalTransaction->update([
+                'status' =>
+                    $status,
+            ]);
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | SAFETY LOG
+            |--------------------------------------------------------------------------
+            |
+            | We do not create another transaction here.
+            | The transaction should already exist because it
+            | was created during the wallet reservation.
+            |
+            */
+
+            Log::warning(
+                'General electricity transaction not found',
+                [
+                    'user_id' =>
+                        $userId,
+
+                    'request_id' =>
+                        $requestId,
+
+                    'status' =>
+                        $status,
+                ]
+            );
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | REFUND FAILED TRANSACTION
+    |--------------------------------------------------------------------------
+    */
+
     protected function refund(
         ElectricityTransaction $transaction
     ): void {
@@ -804,6 +1103,12 @@ class ElectricityController extends Controller
         DB::transaction(function () use (
             $transaction
         ) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | LOCK ELECTRICITY TRANSACTION
+            |--------------------------------------------------------------------------
+            */
 
             $transaction =
                 ElectricityTransaction::whereKey(
@@ -815,7 +1120,7 @@ class ElectricityController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Prevent duplicate refund
+            | PREVENT DUPLICATE REFUND
             |--------------------------------------------------------------------------
             */
 
@@ -833,6 +1138,12 @@ class ElectricityController extends Controller
             }
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | LOCK USER
+            |--------------------------------------------------------------------------
+            */
+
             $user =
                 User::whereKey(
                     $transaction->user_id
@@ -841,19 +1152,29 @@ class ElectricityController extends Controller
                 ->firstOrFail();
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | REFUND WALLET
+            |--------------------------------------------------------------------------
+            */
+
             $user->wallet_balance =
                 (float) $user->wallet_balance
                 + (float) $transaction->total;
 
-
             $user->save();
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | MARK REFUNDED
+            |--------------------------------------------------------------------------
+            */
+
             $transaction->update([
                 'response_message' =>
-                    ($transaction->response_message
-                        ?? '')
-                    . ' Wallet refunded.'
+                    ($transaction->response_message ?? '')
+                    . ' Wallet refunded.',
             ]);
         });
     }

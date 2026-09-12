@@ -137,6 +137,9 @@ public function electricityTransactions()
     );
 }
 
-
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
     
 }

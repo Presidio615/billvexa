@@ -255,8 +255,6 @@ class VtpassService
 
                     'serviceID' => $serviceId,
 
-                    'billersCode' => $phone,
-
                     'phone' => $phone,
 
                     'amount' => $amount,

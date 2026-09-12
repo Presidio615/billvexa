@@ -1202,37 +1202,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
 
-            if (data.status === 'delivered') {
+           if (data.status === 'delivered') {
 
-                showMessage(
-                    data.message ||
-                    'Data bundle purchased successfully.',
-                    'success'
-                );
+                    showMessage(
+                        data.message ||
+                        'Data bundle purchased successfully.',
+                        'success'
+                    );
 
+                    /*
+                    * Open the receipt immediately
+                    */
+                    if (data.receipt_url) {
 
-                form.reset();
+                        setTimeout(() => {
+                            window.location.href = data.receipt_url;
+                        }, 800);
 
-                variationCode.value = '';
+                    } else {
 
-                selectedPlanBox
-                    .classList
-                    .add('d-none');
+                        showMessage(
+                            'Purchase was successful, but the receipt could not be opened.',
+                            'warning'
+                        );
 
+                    }
 
-                networkCards.forEach(card => {
-                    card.classList.remove('clicked');
-                });
-
-
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-
-                return;
-
-            }
-
+                    return;
+                }
 
             if (data.status === 'pending') {
 
