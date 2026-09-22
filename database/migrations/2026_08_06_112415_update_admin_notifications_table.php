@@ -11,28 +11,36 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('admin_notifications', function (Blueprint $table) {
-            //
-            $table->string('recipient_type')->after('message');
+        if (!Schema::hasColumn('admin_notifications', 'recipient_type')) {
+            Schema::table('admin_notifications', function (Blueprint $table) {
+                $table->string('recipient_type')
+                    ->after('message');
+            });
+        }
 
-            $table->string('recipient')->nullable()->after('recipient_type');
+        if (!Schema::hasColumn('admin_notifications', 'recipient_id')) {
+            Schema::table('admin_notifications', function (Blueprint $table) {
+                $table->unsignedBigInteger('recipient_id')
+                    ->nullable()
+                    ->after('recipient_type');
+            });
+        }
 
-            $table->boolean('push')->default(true);
+        if (!Schema::hasColumn('admin_notifications', 'link')) {
+            Schema::table('admin_notifications', function (Blueprint $table) {
+                $table->string('link')
+                    ->nullable()
+                    ->after('recipient_id');
+            });
+        }
 
-            $table->boolean('email')->default(false);
-
-            $table->boolean('sms')->default(false);
-
-            $table->string('status')->default('Pending');
-
-            $table->renameColumn('admin_id', 'created_by');
-
-            $table->dropColumn([
-                'link',
-                'is_read',
-            ]);
-
-        });
+        if (!Schema::hasColumn('admin_notifications', 'is_read')) {
+            Schema::table('admin_notifications', function (Blueprint $table) {
+                $table->boolean('is_read')
+                    ->default(false)
+                    ->after('link');
+            });
+        }
     }
 
     /**
@@ -40,23 +48,19 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('admin_notifications', function (Blueprint $table) {
-            //
-            $table->renameColumn('created_by', 'admin_id');
+        $columns = [
+            'recipient_type',
+            'recipient_id',
+            'link',
+            'is_read',
+        ];
 
-            $table->dropColumn([
-                'recipient_type',
-                'recipient',
-                'push',
-                'email',
-                'sms',
-                'status',
-            ]);
-
-            $table->string('link')->nullable();
-
-            $table->boolean('is_read')->default(false);
-
-        });
+        foreach ($columns as $column) {
+            if (Schema::hasColumn('admin_notifications', $column)) {
+                Schema::table('admin_notifications', function (Blueprint $table) use ($column) {
+                    $table->dropColumn($column);
+                });
+            }
+        }
     }
 };

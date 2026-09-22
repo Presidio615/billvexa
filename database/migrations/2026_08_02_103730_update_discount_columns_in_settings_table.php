@@ -11,19 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            //
+        $columns = [
+            'airtime_discount',
+            'data_discount',
+            'electricity_discount',
+            'cable_discount',
+            'betting_discount',
+            'education_discount',
+            'transport_discount',
+            'sport_discount',
+            'flight_discount',
+            'hotel_discount',
+            'gift_card_discount',
+            'ticket_discount',
+        ];
 
-            $table->decimal('airtime_discount', 5, 2)->default(3.00);
-            $table->decimal('data_discount', 5, 2)->default(2.00);
-            $table->decimal('electricity_discount', 5, 2)->default(1.00);
-            $table->decimal('cable_discount', 5, 2)->default(1.50);
-            $table->decimal('betting_discount', 5, 2)->default(0.50);
-            $table->decimal('education_discount', 5, 2)->default(2.00);
-            $table->decimal('exam_discount', 5, 2)->default(2.00);
-
-       
-        });
+        foreach ($columns as $column) {
+            if (!Schema::hasColumn('settings', $column)) {
+                Schema::table('settings', function (Blueprint $table) use ($column) {
+                    $table->decimal($column, 5, 2)
+                        ->default(3);
+                });
+            }
+        }
     }
 
     /**
@@ -31,20 +41,27 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            //
-            $table->dropColumn([
-                'airtime_discount',
-                'data_discount',
-                'electricity_discount',
-                'cable_discount',
-                'betting_discount',
-                'education_discount',
-                'exam_discount',
-            ]);
+        $columns = [
+            'airtime_discount',
+            'data_discount',
+            'electricity_discount',
+            'cable_discount',
+            'betting_discount',
+            'education_discount',
+            'transport_discount',
+            'sport_discount',
+            'flight_discount',
+            'hotel_discount',
+            'gift_card_discount',
+            'ticket_discount',
+        ];
 
-            $table->decimal('charges', 8, 2)->default(2);
-      
-        });
+        foreach ($columns as $column) {
+            if (Schema::hasColumn('settings', $column)) {
+                Schema::table('settings', function (Blueprint $table) use ($column) {
+                    $table->dropColumn($column);
+                });
+            }
+        }
     }
 };

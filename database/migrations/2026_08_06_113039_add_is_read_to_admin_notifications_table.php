@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('admin_notifications', function (Blueprint $table) {
-            //
-            $table->boolean('is_read')->default(false);
-        });
+        if (!Schema::hasColumn('admin_notifications', 'is_read')) {
+            Schema::table('admin_notifications', function (Blueprint $table) {
+                $table->boolean('is_read')
+                    ->default(false);
+            });
+        }
     }
 
     /**
@@ -22,8 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('admin_notifications', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('admin_notifications', 'is_read')) {
+            Schema::table('admin_notifications', function (Blueprint $table) {
+                $table->dropColumn('is_read');
+            });
+        }
     }
 };

@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-    
+        if (!Schema::hasColumn('settings', 'lockout_duration')) { 
+            Schema::table('settings', function (Blueprint $table) { 
             $table->integer('lockout_duration')
-                  ->default(15)
-                  ->after('login_attempts');
-    
-        });
+            ->default(15) 
+            ->after('login_attempts'); 
+        }); 
+        }
     }
 
     /**

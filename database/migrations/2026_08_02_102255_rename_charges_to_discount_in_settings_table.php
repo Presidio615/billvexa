@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            //
-            $table->renameColumn('charges', 'discount');
-        });
+        // Rename charges to discount only if charges exists
+        // and discount does not already exist.
+        if (
+            Schema::hasColumn('settings', 'charges') &&
+            !Schema::hasColumn('settings', 'discount')
+        ) {
+            Schema::table('settings', function (Blueprint $table) {
+                $table->renameColumn('charges', 'discount');
+            });
+        }
     }
 
     /**
@@ -22,9 +28,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            //
-            $table->renameColumn('discount', 'charges');
-        });
+        // Rename discount back to charges only if discount exists
+        // and charges does not already exist.
+        if (
+            Schema::hasColumn('settings', 'discount') &&
+            !Schema::hasColumn('settings', 'charges')
+        ) {
+            Schema::table('settings', function (Blueprint $table) {
+                $table->renameColumn('discount', 'charges');
+            });
+        }
     }
 };
