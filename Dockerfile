@@ -14,10 +14,23 @@ RUN npm run build
 # Laravel PHP application
 FROM php:8.2-apache
 
+
 RUN apt-get update && apt-get install -y \
-    libpq-dev libzip-dev unzip git \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring bcmath zip \
-    && a2enmod rewrite
+    libpq-dev \
+    libzip-dev \
+    libonig-dev \
+    zlib1g-dev \
+    unzip \
+    git \
+    && docker-php-ext-install \
+    pdo_mysql \
+    pdo_pgsql \
+    mbstring \
+    bcmath \
+    zip \
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
