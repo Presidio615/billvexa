@@ -757,3 +757,8 @@ Route::get('/notifications/read/{notification}', [NotificationController::class,
 
         });
     });
+
+
+    Route::get('/version-check', function () {
+    return app()->version();
+});
