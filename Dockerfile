@@ -15,19 +15,27 @@ RUN npm run build
 FROM php:8.3-apache
 
 # Install system dependencies and PHP extensions
+
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     libonig-dev \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
     zlib1g-dev \
     unzip \
     git \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
     pdo_mysql \
     pdo_pgsql \
     mbstring \
     bcmath \
     zip \
+    gd \
+    fileinfo \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
