@@ -51,7 +51,7 @@ COPY . .
 COPY --from=frontend /app/public/build ./public/build
 
 # Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction -vvv
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Configure Apache for Laravel
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' \
