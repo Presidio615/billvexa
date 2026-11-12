@@ -33,8 +33,7 @@ RUN apt-get update && apt-get install -y \
 
 
 # Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
+RUN bash -o pipefail -c 'composer install --no-dev --optimize-autoloader --no-interaction -vvv 2>&1 | tee /dev/stderr'
 WORKDIR /var/www/html
 
 COPY . .
