@@ -10,11 +10,8 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-
 # Laravel PHP application
 FROM php:8.4-apache
-
-# Install system dependencies and PHP extensions
 
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
@@ -36,8 +33,10 @@ RUN apt-get update && apt-get install -y \
     zip \
     gd \
     fileinfo \
-    && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+    && a2dismod mpm_event mpm_worker || true
+
+# Enable required Apache modules
+RUN a2enmod mpm_prefork rewrite
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -61,7 +60,6 @@ RUN sed -ri 's!/var/www/html!/var/www/html/public!g' \
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Expose Render port
 EXPOSE 10000
 
 # Start Apache
