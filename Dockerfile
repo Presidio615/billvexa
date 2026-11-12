@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 
-# Laravel PHP application
+# Laravel application
 FROM php:8.4-apache
 
 # Install dependencies and PHP extensions
@@ -36,18 +36,8 @@ RUN apt-get update && apt-get install -y \
     fileinfo \
     && rm -rf /var/lib/apt/lists/*
 
-
-# Clean Apache MPM configuration
-
-# Diagnose Apache MPM configuration
-RUN echo "=== ENABLED MPM FILES ===" && \
-    ls -la /etc/apache2/mods-enabled/mpm* || true
-
-RUN echo "=== MPM LOAD DIRECTIVES ===" && \
-    grep -RniE '^[[:space:]]*LoadModule[[:space:]]+mpm_' \
-    /etc/apache2 || true
-
-
+# Enable URL rewriting
+RUN a2enmod rewrite
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -63,12 +53,12 @@ COPY --from=frontend /app/public/build ./public/build
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# Configure Apache
+# Configure Apache for Laravel
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' \
     /etc/apache2/sites-available/000-default.conf \
     && echo '<Directory /var/www/html/public>\nAllowOverride All\nRequire all granted\n</Directory>' >> /etc/apache2/apache2.conf
 
-# Permissions
+# Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 10000
